@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -43,10 +43,11 @@
     canvas.img-preview{max-width:100%;border-radius:12px;image-rendering:pixelated;box-shadow:0 2px 12px rgba(0,0,0,.08)}
     .progress-bar{height:6px;background:#e2ddd5;border-radius:3px;overflow:hidden;position:relative}
     .progress-bar-fill{height:100%;background:linear-gradient(90deg,#0d7377,#2563eb,#0d7377);background-size:200% 100%;animation:shimmer 2s infinite;transition:width .3s;border-radius:3px}
-    input,select{background:#fff!important;border:1.5px solid #e2ddd5!important;color:#1a1a1a!important;border-radius:10px!important}
-    input:focus,select:focus{border-color:#0d7377!important;outline:none;box-shadow:0 0 0 3px rgba(13,115,119,.1)!important}
+    input[type="text"],input[type="number"],select{background:#fff!important;border:1.5px solid #e2ddd5!important;color:#1a1a1a!important;border-radius:10px!important}
+    input[type="text"]:focus,input[type="number"]:focus,select:focus{border-color:#0d7377!important;outline:none;box-shadow:0 0 0 3px rgba(13,115,119,.1)!important}
+    input[type="checkbox"]{accent-color:#0d7377;width:16px;height:16px;cursor:pointer;flex-shrink:0}
     .rob-card{background:#fff;border:1px solid #e2ddd5;border-radius:16px;overflow:hidden;transition:all .35s ease}
-    .rob-card:hover{box-shadow:12px 32px rgba(0,0,0,.12);transform:translateY(-4px)}
+    .rob-card:hover{box-shadow:0 12px 32px rgba(0,0,0,.12);transform:translateY(-4px)}
     .rob-card canvas{width:100%;display:block;image-rendering:pixelated}
     .data-table{border-collapse:separate;border-spacing:0}
     .data-table thead th{background:#faf8f5;position:sticky;top:0;z-index:1}
@@ -57,12 +58,10 @@
     .fancy-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
     .fancy-divider::before,.fancy-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#e2ddd5,transparent)}
     .fancy-divider span{font-family:'Arial';font-size:10px;color:#7a7570;text-transform:uppercase;letter-spacing:.15em}
-    .rob-noise{accent-color:#0d7377}
     .enc-preview-wrap{background:#faf8f5;border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:center;min-height:180px}
     .enc-preview-wrap canvas{max-width:100%;max-height:320px;object-fit:contain;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.08)}
-    .noise-pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s ease;border:1.5px solid #e2ddd5;background:#fff;color:#1a1a1a;min-width:72px}
+    .noise-pill{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s ease;border:1.5px solid #e2ddd5;background:#fff;color:#1a1a1a}
     .noise-pill:hover{border-color:#0d7377;background:#e6f3f3}
-    .noise-pill input:checked + span{color:#0d7377}
     .noise-pill:has(input:checked){border-color:#0d7377;background:linear-gradient(135deg,#e6f3f3,#f0fdfd);color:#0d7377;box-shadow:0 2px 8px rgba(13,115,119,.12)}
   </style>
 </head>
@@ -85,23 +84,23 @@
       <p class="font-mono text-[10px] text-muted uppercase tracking-widest px-3 mb-2 mt-1">Modules</p>
       <button onclick="switchTab('bitstream')" id="nav-bitstream" class="nav-item active w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-accent-light flex-shrink-0"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>
-        <div><span class="block text-sm">比特流分析</span><span class="block text-[10px] text-muted font-normal">Entropy & ACF</span></div>
+        <div><span class="block text-sm">Bitstream Analysis</span><span class="block text-[10px] text-muted font-normal">Entropy & ACF</span></div>
       </button>
       <button onclick="switchTab('encryption')" id="nav-encryption" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div>
-        <div><span class="block text-sm">图像加密</span><span class="block text-[10px] text-muted font-normal">XOR Encrypt</span></div>
+        <div><span class="block text-sm">Image Encryption</span><span class="block text-[10px] text-muted font-normal">XOR Encrypt</span></div>
       </button>
       <button onclick="switchTab('statistics')" id="nav-statistics" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-        <div><span class="block text-sm">统计学分析</span><span class="block text-[10px] text-muted font-normal">Histogram & Corr</span></div>
+        <div><span class="block text-sm">Statistical Analysis</span><span class="block text-[10px] text-muted font-normal">Histogram & Corr</span></div>
       </button>
       <button onclick="switchTab('quality')" id="nav-quality" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
-        <div><span class="block text-sm">保真度分析</span><span class="block text-[10px] text-muted font-normal">MSE · PSNR · SSIM</span></div>
+        <div><span class="block text-sm">Fidelity Analysis</span><span class="block text-[10px] text-muted font-normal">MSE · PSNR · SSIM</span></div>
       </button>
       <button onclick="switchTab('robustness')" id="nav-robustness" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
-        <div><span class="block text-sm">鲁棒性测试</span><span class="block text-[10px] text-muted font-normal">Noise Attack</span></div>
+        <div><span class="block text-sm">Robustness Test</span><span class="block text-[10px] text-muted font-normal">Noise Attack</span></div>
       </button>
     </div>
     <div class="p-5 border-t border-line">
@@ -112,99 +111,97 @@
 
   <main class="ml-64 flex-1 min-h-screen bg-cream">
 
-    <!-- TAB 1: Bitstream -->
     <section id="sec-bitstream" class="p-10 max-w-7xl mx-auto">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">01</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">比特流分析</h2>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Bitstream Analysis</h2>
         </div>
-        <p class="font-body text-sm text-muted">上传 TRNG 比特流文件，计算香农熵、自相关函数，生成 Bitmap 可视化</p>
+        <p class="font-body text-sm text-muted">Upload TRNG bitstream file, compute Shannon entropy, ACF, and generate Bitmap visualization</p>
       </div>
       <div class="card p-8 mb-8 fade-in" style="animation-delay:.1s">
-        <h3 class="font-display font-700 text-base text-ink mb-1">数据输入</h3>
-        <p class="font-body text-sm text-muted mb-5">上传比特流文件并配置分析参数</p>
+        <h3 class="font-display font-700 text-base text-ink mb-1">Data Input</h3>
+        <p class="font-body text-sm text-muted mb-5">Upload bitstream file and configure analysis parameters</p>
         <div class="drop-zone rounded-xl p-10 text-center cursor-pointer" onclick="document.getElementById('bs-file').click()">
           <div class="w-16 h-16 rounded-2xl bg-accent-light flex items-center justify-center mx-auto mb-4">
             <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
           </div>
-          <p class="text-base text-ink font-medium">拖拽或点击上传比特流文件</p>
-          <p class="text-sm text-muted mt-1">支持 <code class="font-mono text-accent bg-accent-light px-2 py-0.5 rounded-md">.txt</code> 格式纯文本比特流</p>
-          <p class="text-xs text-line mt-3 font-mono" id="bs-filename">未选择文件</p>
+          <p class="text-base text-ink font-medium">Drag & drop or click to upload bitstream file</p>
+          <p class="text-sm text-muted mt-1">Supports <code class="font-mono text-accent bg-accent-light px-2 py-0.5 rounded-md">.txt</code> plain text bitstream</p>
+          <p class="text-xs text-line mt-3 font-mono" id="bs-filename">No file selected</p>
         </div>
         <input type="file" id="bs-file" class="hidden" accept=".txt" onchange="handleBSFile(this)">
         <div class="fancy-divider"><span>Parameters</span></div>
         <div class="grid grid-cols-2 gap-6">
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">分析比特数 N</label><input type="number" id="bs-n" value="100000" min="100" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">ACF 最大延迟 (Lag)</label><input type="number" id="bs-lag" value="1000" min="10" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Analysis Bits N</label><input type="number" id="bs-n" value="100000" min="100" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">ACF Max Lag</label><input type="number" id="bs-lag" value="1000" min="10" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
         </div>
         <button onclick="runBitstreamAnalysis()" class="btn-primary mt-6 px-8 py-3 rounded-xl font-body text-sm">
-          <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>开始分析</span>
+          <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Start Analysis</span>
         </button>
         <div id="bs-progress" class="hidden mt-4">
           <div class="progress-bar"><div class="progress-bar-fill" id="bs-progress-bar" style="width:0%"></div></div>
-          <p class="font-mono text-xs text-muted mt-2" id="bs-status">处理中...</p>
+          <p class="font-mono text-xs text-muted mt-2" id="bs-status">Processing...</p>
         </div>
       </div>
       <div id="bs-results" class="hidden">
         <div class="grid grid-cols-4 gap-5 mb-8 fade-in">
           <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">香农熵</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Shannon Entropy</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
             <p class="font-display font-800 text-3xl text-accent" id="bs-entropy">—</p><p class="font-mono text-xs text-muted mt-1">bits / symbol</p>
           </div>
           <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)">
             <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">P(1)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(99,102,241,.08)"><svg class="w-4 h-4" style="color:#6366f1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div></div>
-            <p class="font-display font-800 text-3xl" style="color:#6366f1" id="bs-p1">—</p><p class="font-mono text-xs text-muted mt-1">bit=1 概率</p>
+            <p class="font-display font-800 text-3xl" style="color:#6366f1" id="bs-p1">—</p><p class="font-mono text-xs text-muted mt-1">bit=1 probability</p>
           </div>
           <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">1 的数量</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div></div>
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 1s</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div></div>
             <p class="font-display font-800 text-3xl text-rose" id="bs-count1">—</p>
           </div>
           <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">0 的数量</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(196,154,42,.08)"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/></svg></div></div>
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 0s</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(196,154,42,.08)"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/></svg></div></div>
             <p class="font-display font-800 text-3xl text-gold" id="bs-count0">—</p>
           </div>
         </div>
         <div class="grid grid-cols-2 gap-6 mb-8">
           <div class="card p-6 fade-in">
-            <h3 class="font-display font-700 text-base text-ink mb-1">Bitmap 可视化</h3>
-            <p class="font-body text-xs text-muted mb-4">比特流的空间分布模式，理想随机源应呈现均匀噪声</p>
+            <h3 class="font-display font-700 text-base text-ink mb-1">Bitmap Visualization</h3>
+            <p class="font-body text-xs text-muted mb-4">Spatial distribution of bitstream; ideal random source should show uniform noise</p>
             <div class="bg-sand rounded-xl p-4"><canvas id="bs-bitmap" class="w-full rounded-lg" style="background:#fff"></canvas></div>
             <p class="font-mono text-xs text-muted mt-3 text-center" id="bs-bitmap-info"></p>
           </div>
           <div class="card p-6 fade-in">
-            <h3 class="font-display font-700 text-base text-ink mb-1">熵值计算过程</h3>
-            <p class="font-body text-xs text-muted mb-4">香农熵 H = -Σp(i)·log₂(p(i)) 的逐步推导</p>
+            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Calculation</h3>
+            <p class="font-body text-xs text-muted mb-4">Step-by-step derivation of Shannon entropy H = -Σp(i)·log₂(p(i))</p>
             <div id="bs-calc-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-80 leading-relaxed"></div>
           </div>
         </div>
         <div class="card p-6 fade-in">
-          <h3 class="font-display font-700 text-base text-ink mb-1">自相关函数 (ACF)</h3>
-          <p class="font-body text-xs text-muted mb-4">衡量比特流在不同延迟下的自相关性，理想值应落在 95% 置信区间内</p>
+          <h3 class="font-display font-700 text-base text-ink mb-1">Autocorrelation Function (ACF)</h3>
+          <p class="font-body text-xs text-muted mb-4">Measures autocorrelation at different lags; ideal values should fall within the 95% confidence interval</p>
           <canvas id="bs-acf-chart" height="120"></canvas>
         </div>
       </div>
     </section>
 
-    <!-- TAB 2: Encryption -->
     <section id="sec-encryption" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">02</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">图像 XOR 加密 / 解密</h2>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Image XOR Encryption / Decryption</h2>
         </div>
-        <p class="font-body text-sm text-muted">使用 TRNG 比特流作为密钥，对彩色图像逐像素异或加密与解密</p>
+        <p class="font-body text-sm text-muted">Use TRNG bitstream as key for pixel-wise XOR encryption and decryption of color images</p>
       </div>
       <div class="grid grid-cols-2 gap-6 mb-8">
         <div class="card p-7 fade-in">
-          <h3 class="font-display font-700 text-base text-ink mb-1">原始图像</h3>
-          <p class="font-body text-xs text-muted mb-4">选择待加密的彩色图像</p>
+          <h3 class="font-display font-700 text-base text-ink mb-1">Original Image</h3>
+          <p class="font-body text-xs text-muted mb-4">Select the color image to encrypt</p>
           <div id="enc-img-dropzone" class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-img').click()">
             <div class="w-12 h-12 rounded-xl bg-sand flex items-center justify-center mx-auto mb-3">
               <svg class="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
-            <p class="text-sm text-ink font-medium">拖拽或点击上传图像</p>
-            <p class="text-xs text-line mt-1" id="enc-img-name">支持 PNG / JPG</p>
+            <p class="text-sm text-ink font-medium">Drag & drop or click to upload image</p>
+            <p class="text-xs text-line mt-1" id="enc-img-name">Supports PNG / JPG</p>
           </div>
           <input type="file" id="enc-img" class="hidden" accept="image/*" onchange="handleEncImg(this)">
           <div id="enc-preview-area" class="enc-preview-wrap mt-4 hidden">
@@ -212,140 +209,129 @@
           </div>
         </div>
         <div class="card p-7 fade-in" style="animation-delay:.08s">
-          <h3 class="font-display font-700 text-base text-ink mb-1">密钥比特流</h3>
-          <p class="font-body text-xs text-muted mb-4">上传 TRNG 生成的密钥文件</p>
+          <h3 class="font-display font-700 text-base text-ink mb-1">Key Bitstream</h3>
+          <p class="font-body text-xs text-muted mb-4">Upload the TRNG-generated key file</p>
           <div class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-key').click()">
             <div class="w-12 h-12 rounded-xl bg-sand flex items-center justify-center mx-auto mb-3">
               <svg class="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
             </div>
-            <p class="text-sm text-ink font-medium">拖拽或点击上传密钥文件</p>
-            <p class="text-xs text-line mt-1" id="enc-key-name">.txt 格式</p>
+            <p class="text-sm text-ink font-medium">Drag & drop or click to upload key file</p>
+            <p class="text-xs text-line mt-1" id="enc-key-name">.txt format</p>
           </div>
           <input type="file" id="enc-key" class="hidden" accept=".txt" onchange="handleEncKey(this)">
-          <div class="mt-4"><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">起始比特位置</label><input type="number" id="enc-start" value="0" min="0" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
+          <div class="mt-4"><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Start Bit Position</label><input type="number" id="enc-start" value="0" min="0" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
         </div>
       </div>
       <button onclick="runEncryption()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>加密 & 解密</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Encrypt & Decrypt</span>
       </button>
-      <div id="enc-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="enc-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="enc-status">处理中...</p></div>
+      <div id="enc-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="enc-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="enc-status">Processing...</p></div>
       <div id="enc-results" class="hidden">
         <div class="fancy-divider"><span>Results</span></div>
         <div class="grid grid-cols-3 gap-6 mb-8 fade-in">
           <div class="card p-6 text-center">
             <div class="glow-badge mb-3 justify-center"><span class="font-mono">Original</span></div>
-            <h3 class="font-display font-700 text-base text-ink mb-4">原始图像</h3>
+            <h3 class="font-display font-700 text-base text-ink mb-4">Original Image</h3>
             <canvas id="enc-orig-canvas" class="img-preview mx-auto"></canvas>
           </div>
           <div class="card p-6 text-center" style="border-color:rgba(194,66,90,.3)">
             <div class="glow-badge mb-3 justify-center" style="background:rgba(194,66,90,.08);color:#c2425a;border-color:rgba(194,66,90,.15)"><span class="font-mono">Encrypted</span></div>
-            <h3 class="font-display font-700 text-base text-ink mb-4">加密图像</h3>
+            <h3 class="font-display font-700 text-base text-ink mb-4">Encrypted Image</h3>
             <canvas id="enc-enc-canvas" class="img-preview mx-auto"></canvas>
           </div>
           <div class="card p-6 text-center" style="border-color:rgba(22,163,74,.3)">
             <div class="glow-badge mb-3 justify-center" style="background:rgba(22,163,74,.08);color:#16a34a;border-color:rgba(22,163,74,.15)"><span class="font-mono">Decrypted</span></div>
-            <h3 class="font-display font-700 text-base text-ink mb-4">解密图像</h3>
+            <h3 class="font-display font-700 text-base text-ink mb-4">Decrypted Image</h3>
             <canvas id="enc-dec-canvas" class="img-preview mx-auto"></canvas>
           </div>
         </div>
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">密钥使用统计</h3><div id="enc-stats" class="font-mono text-sm text-muted leading-loose"></div></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Key Usage Statistics</h3><div id="enc-stats" class="font-mono text-sm text-muted leading-loose"></div></div>
       </div>
     </section>
 
-    <!-- TAB 3: Statistics -->
     <section id="sec-statistics" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">03</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">统计学分析</h2>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Statistical Analysis</h2>
         </div>
-        <p class="font-body text-sm text-muted">对比原始图像与加密图像的直方图分布和相邻像素相关性</p>
+        <p class="font-body text-sm text-muted">Compare histogram distributions and adjacent pixel correlations between original and encrypted images</p>
       </div>
       <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">原始图像</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-orig').click()"><p class="text-sm text-ink font-medium" id="stat-orig-name">点击上传原始图像</p></div><input type="file" id="stat-orig" class="hidden" accept="image/*"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">加密图像</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-enc').click()"><p class="text-sm text-ink font-medium" id="stat-enc-name">点击上传加密图像</p></div><input type="file" id="stat-enc" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-orig').click()"><p class="text-sm text-ink font-medium" id="stat-orig-name">Click to upload original image</p></div><input type="file" id="stat-orig" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-enc').click()"><p class="text-sm text-ink font-medium" id="stat-enc-name">Click to upload encrypted image</p></div><input type="file" id="stat-enc" class="hidden" accept="image/*"></div>
       </div>
       <div class="card p-5 mb-6 fade-in flex items-center gap-4">
-        <label class="font-mono text-xs text-muted uppercase tracking-wider whitespace-nowrap">相关性采样对数</label>
+        <label class="font-mono text-xs text-muted uppercase tracking-wider whitespace-nowrap">Correlation Sample Pairs</label>
         <input type="number" id="stat-pairs" value="3000" min="100" class="rounded-xl px-4 py-2.5 font-mono text-sm w-40">
       </div>
       <button onclick="runStatAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>运行统计学分析</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Run Statistical Analysis</span>
       </button>
       <div id="stat-results" class="hidden">
-
-        <!-- 原始图像直方图 3格 -->
         <div class="fancy-divider"><span>Original · Histogram</span></div>
-        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">原始图像颜色直方图</h3>
+        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Original Image Color Histogram</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
           <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#c2425a"></div><h4 class="font-display font-600 text-sm text-ink">Red Channel</h4></div><canvas id="hist-orig-r" height="160"></canvas></div>
           <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#16a34a"></div><h4 class="font-display font-600 text-sm text-ink">Green Channel</h4></div><canvas id="hist-orig-g" height="160"></canvas></div>
           <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#2563eb"></div><h4 class="font-display font-600 text-sm text-ink">Blue Channel</h4></div><canvas id="hist-orig-b" height="160"></canvas></div>
         </div>
-
-        <!-- 加密图像直方图 3格 -->
         <div class="fancy-divider"><span>Encrypted · Histogram</span></div>
-        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">加密图像颜色直方图</h3>
+        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Encrypted Image Color Histogram</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
           <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#c2425a"></div><h4 class="font-display font-600 text-sm text-ink">Red Channel</h4></div><canvas id="hist-enc-r" height="160"></canvas></div>
           <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#16a34a"></div><h4 class="font-display font-600 text-sm text-ink">Green Channel</h4></div><canvas id="hist-enc-g" height="160"></canvas></div>
           <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#2563eb"></div><h4 class="font-display font-600 text-sm text-ink">Blue Channel</h4></div><canvas id="hist-enc-b" height="160"></canvas></div>
         </div>
-
-        <!-- 原始图像相关性 3格 -->
         <div class="fancy-divider"><span>Original · Correlation</span></div>
-        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">原始图像相邻像素相关性</h3>
+        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Original Image Adjacent Pixel Correlation</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
-          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">水平方向</h4></div><canvas id="corr-orig-h" height="180"></canvas></div>
-          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">垂直方向</h4></div><canvas id="corr-orig-v" height="180"></canvas></div>
-          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">对角线方向</h4></div><canvas id="corr-orig-d" height="180"></canvas></div>
+          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">Horizontal</h4></div><canvas id="corr-orig-h" height="180"></canvas></div>
+          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">Vertical</h4></div><canvas id="corr-orig-v" height="180"></canvas></div>
+          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-accent"></div><h4 class="font-display font-600 text-sm text-ink">Diagonal</h4></div><canvas id="corr-orig-d" height="180"></canvas></div>
         </div>
-
-        <!-- 加密图像相关性 3格 -->
         <div class="fancy-divider"><span>Encrypted · Correlation</span></div>
-        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">加密图像相邻像素相关性</h3>
+        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Encrypted Image Adjacent Pixel Correlation</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
-          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">水平方向</h4></div><canvas id="corr-enc-h" height="180"></canvas></div>
-          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">垂直方向</h4></div><canvas id="corr-enc-v" height="180"></canvas></div>
-          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">对角线方向</h4></div><canvas id="corr-enc-d" height="180"></canvas></div>
+          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">Horizontal</h4></div><canvas id="corr-enc-h" height="180"></canvas></div>
+          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">Vertical</h4></div><canvas id="corr-enc-v" height="180"></canvas></div>
+          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full bg-rose"></div><h4 class="font-display font-600 text-sm text-ink">Diagonal</h4></div><canvas id="corr-enc-d" height="180"></canvas></div>
         </div>
-
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">相关系数汇总</h3><div id="corr-table" class="overflow-x-auto"></div></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Correlation Coefficient Summary</h3><div id="corr-table" class="overflow-x-auto"></div></div>
       </div>
     </section>
 
-    <!-- TAB 4: Fidelity -->
     <section id="sec-quality" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">04</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">保真度分析</h2>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Fidelity Analysis</h2>
         </div>
-        <p class="font-body text-sm text-muted">计算原始图像与加密图像之间的 MSE、PSNR 和 SSIM</p>
+        <p class="font-body text-sm text-muted">Compute MSE, PSNR, and SSIM between original and encrypted images</p>
       </div>
       <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">原始图像</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">点击上传原始图像</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">加密图像</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">点击上传加密图像</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">Click to upload original image</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">Click to upload encrypted image</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
       </div>
       <div class="card p-6 mb-6 fade-in">
-        <h3 class="font-display font-700 text-sm text-ink mb-4">SSIM 参数配置</h3>
+        <h3 class="font-display font-700 text-sm text-ink mb-4">SSIM Parameter Configuration</h3>
         <div class="grid grid-cols-3 gap-5">
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">窗口大小</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8×8</option><option value="11" selected>11×11</option><option value="16">16×16</option></select></div>
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Window Size</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8x8</option><option value="11" selected>11x11</option><option value="16">16x16</option></select></div>
           <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K1</label><input type="number" id="ssim-k1" value="0.01" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
           <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K2</label><input type="number" id="ssim-k2" value="0.03" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
         </div>
       </div>
       <button onclick="runQualityAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>计算 MSE & PSNR & SSIM</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Compute MSE & PSNR & SSIM</span>
       </button>
-      <div id="q-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="q-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="q-status">处理中...</p></div>
+      <div id="q-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="q-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="q-status">Processing...</p></div>
       <div id="q-results" class="hidden">
         <div class="grid grid-cols-5 gap-4 mb-8 fade-in">
-          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">整体 MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">整体 PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p><p class="font-mono text-xs text-muted mt-1">dB</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">整体 SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">差值范围</p><p class="font-display font-700 text-lg mt-1" style="color:#6366f1" id="diff-range">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#7a7570;--accent-glow:rgba(122,117,112,.06)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">图像尺寸</p><p class="font-display font-700 text-lg text-ink mt-1" id="img-size-info">512×512</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p><p class="font-mono text-xs text-muted mt-1">dB</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Diff Range</p><p class="font-display font-700 text-lg mt-1" style="color:#6366f1" id="diff-range">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#7a7570;--accent-glow:rgba(122,117,112,.06)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Image Size</p><p class="font-display font-700 text-lg text-ink mt-1" id="img-size-info">512x512</p></div>
         </div>
         <div class="fancy-divider"><span>Channel Breakdown</span></div>
         <div class="grid grid-cols-3 gap-5 mb-8 fade-in" style="animation-delay:.05s">
@@ -377,55 +363,53 @@
             </div>
           </div>
         </div>
-        <div class="card p-6 mb-8 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-4">各通道详细统计</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
-        <div class="card p-6 fade-in" style="animation-delay:.15s"><h3 class="font-display font-700 text-base text-ink mb-4">详细计算过程</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
+        <div class="card p-6 mb-8 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-4">Channel Detail Statistics</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
+        <div class="card p-6 fade-in" style="animation-delay:.15s"><h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
       </div>
     </section>
 
-    <!-- TAB 5: Robustness -->
     <section id="sec-robustness" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">05</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">鲁棒性测试</h2>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Robustness Test</h2>
         </div>
-        <p class="font-body text-sm text-muted">对加密图像施加不同比例椒盐噪声后解密，评估抗噪声能力</p>
+        <p class="font-body text-sm text-muted">Add salt-and-pepper noise at different ratios to the encrypted image, then decrypt to evaluate noise resistance</p>
       </div>
-      <!-- 三列卡片 -->
-      <div class="grid grid-cols-3 gap-5 mb-6">
+      <div class="grid gap-5 mb-6" style="grid-template-columns:2fr 2fr 3fr">
         <div class="card p-6 fade-in">
-          <h3 class="font-display font-700 text-base text-ink mb-2">原始图像</h3>
-          <p class="font-body text-xs text-muted mb-3">选择待测试的图像</p>
-          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer" onclick="document.getElementById('rob-img').click()"><p class="text-sm text-ink font-medium" id="rob-img-name">点击上传</p></div>
+          <h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3>
+          <p class="font-body text-xs text-muted mb-3">Select the image to test</p>
+          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer" onclick="document.getElementById('rob-img').click()"><p class="text-sm text-ink font-medium" id="rob-img-name">Click to upload</p></div>
           <input type="file" id="rob-img" class="hidden" accept="image/*">
         </div>
         <div class="card p-6 fade-in" style="animation-delay:.06s">
-          <h3 class="font-display font-700 text-base text-ink mb-2">密钥比特流</h3>
-          <p class="font-body text-xs text-muted mb-3">上传对应的密钥文件</p>
-          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer" onclick="document.getElementById('rob-key').click()"><p class="text-sm text-ink font-medium" id="rob-key-name">点击上传 .txt</p></div>
+          <h3 class="font-display font-700 text-base text-ink mb-2">Key Bitstream</h3>
+          <p class="font-body text-xs text-muted mb-3">Upload the corresponding key file</p>
+          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer" onclick="document.getElementById('rob-key').click()"><p class="text-sm text-ink font-medium" id="rob-key-name">Click to upload .txt</p></div>
           <input type="file" id="rob-key" class="hidden" accept=".txt">
         </div>
         <div class="card p-6 fade-in" style="animation-delay:.12s">
-          <h3 class="font-display font-700 text-base text-ink mb-2">噪声比例</h3>
-          <p class="font-body text-xs text-muted mb-3">选择要测试的噪声强度</p>
+          <h3 class="font-display font-700 text-base text-ink mb-2">Noise Ratio</h3>
+          <p class="font-body text-xs text-muted mb-3">Select noise levels to test</p>
           <div class="flex flex-wrap gap-2">
-            <label class="noise-pill"><input type="checkbox" class="rob-noise hidden" value="0" checked><span>0%</span></label>
-            <label class="noise-pill"><input type="checkbox" class="rob-noise hidden" value="6.25" checked><span>6.25%</span></label>
-            <label class="noise-pill"><input type="checkbox" class="rob-noise hidden" value="12.5" checked><span>12.5%</span></label>
-            <label class="noise-pill"><input type="checkbox" class="rob-noise hidden" value="25" checked><span>25%</span></label>
-            <label class="noise-pill"><input type="checkbox" class="rob-noise hidden" value="50" checked><span>50%</span></label>
+            <label class="noise-pill"><input type="checkbox" class="rob-noise" value="0" checked> 0%</label>
+            <label class="noise-pill"><input type="checkbox" class="rob-noise" value="6.25" checked> 6.25%</label>
+            <label class="noise-pill"><input type="checkbox" class="rob-noise" value="12.5" checked> 12.5%</label>
+            <label class="noise-pill"><input type="checkbox" class="rob-noise" value="25" checked> 25%</label>
+            <label class="noise-pill"><input type="checkbox" class="rob-noise" value="50" checked> 50%</label>
           </div>
         </div>
       </div>
       <button onclick="runRobustnessTest()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>运行鲁棒性测试</span>
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Run Robustness Test</span>
       </button>
-      <div id="rob-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="rob-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="rob-status">处理中...</p></div>
+      <div id="rob-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="rob-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="rob-status">Processing...</p></div>
       <div id="rob-results" class="hidden">
         <div class="fancy-divider"><span>Decryption Results</span></div>
-        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">各噪声比例解密结果</h3>
+        <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Decryption Results by Noise Ratio</h3>
         <div id="rob-gallery" class="grid gap-5 mb-10 fade-in"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-1">PSNR 随噪声比例变化</h3><p class="font-body text-xs text-muted mb-4">噪声越大，解密图像质量越差</p><canvas id="rob-psnr-chart" height="100"></canvas></div>
+        <div class="card p-6 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-1">PSNR vs Noise Ratio</h3><p class="font-body text-xs text-muted mb-4">Higher noise leads to lower decrypted image quality</p><canvas id="rob-psnr-chart" height="100"></canvas></div>
       </div>
     </section>
   </main>
@@ -444,151 +428,92 @@ function computeSSIMChannel(ch1,ch2,w,h,ws,K1,K2){const L=255,C1=(K1*L)**2,C2=(K
 function computeSSIM(id1,id2,ws,K1,K2){const w=id1.width,h=id1.height,d1=id1.data,d2=id2.data;const ch=(d,i)=>{const a=new Float64Array(w*h);for(let j=0;j<w*h;j++)a[j]=d[j*4+i];return a;};const r1=ch(d1,0),g1=ch(d1,1),b1=ch(d1,2),r2=ch(d2,0),g2=ch(d2,1),b2=ch(d2,2);const sR=computeSSIMChannel(r1,r2,w,h,ws,K1,K2),sG=computeSSIMChannel(g1,g2,w,h,ws,K1,K2),sB=computeSSIMChannel(b1,b2,w,h,ws,K1,K2);return{r:sR,g:sG,b:sB,all:(sR+sG+sB)/3};}
 Chart.defaults.color='#7a7570';Chart.defaults.borderColor='#e2ddd5';Chart.defaults.font.family='Arial';
 
-/* ===== Custom five-pointed star plugin ===== */
-const fivePointStarPlugin = {
-  id: 'fivePointStar',
-  afterDatasetsDraw(chart) {
-    chart.data.datasets.forEach((dataset, di) => {
-      if (dataset._drawStar !== true) return;
-      const meta = chart.getDatasetMeta(di);
-      const ctx = chart.ctx;
-      meta.data.forEach((pt) => {
-        const { x, y } = pt.getCenterPoint();
-        const r = dataset._starSize || 7;
-        ctx.save();
-        ctx.fillStyle = dataset.pointBackgroundColor || '#c2425a';
-        ctx.strokeStyle = dataset.pointBorderColor || '#c2425a';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        for (let k = 0; k < 5; k++) {
-          const outerAngle = (k * 2 * Math.PI / 5) - Math.PI / 2;
-          const innerAngle = ((k + 0.5) * 2 * Math.PI / 5) - Math.PI / 2;
-          const ox = x + r * Math.cos(outerAngle);
-          const oy = y + r * Math.sin(outerAngle);
-          const ix = x + (r * 0.382) * Math.cos(innerAngle);
-          const iy = y + (r * 0.382) * Math.sin(innerAngle);
-          if (k === 0) ctx.moveTo(ox, oy); else ctx.lineTo(ox, oy);
-          ctx.lineTo(ix, iy);
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.restore();
-      });
-    });
-  }
-};
+const fivePointStarPlugin={id:'fivePointStar',afterDatasetsDraw(chart){chart.data.datasets.forEach((dataset,di)=>{if(dataset._drawStar!==true)return;const meta=chart.getDatasetMeta(di);const ctx=chart.ctx;meta.data.forEach((pt)=>{const{x,y}=pt.getCenterPoint();const r=dataset._starSize||7;ctx.save();ctx.fillStyle=dataset.pointBackgroundColor||'#c2425a';ctx.strokeStyle=dataset.pointBorderColor||'#c2425a';ctx.lineWidth=1;ctx.beginPath();for(let k=0;k<5;k++){const oa=(k*2*Math.PI/5)-Math.PI/2;const ia=((k+0.5)*2*Math.PI/5)-Math.PI/2;const ox=x+r*Math.cos(oa);const oy=y+r*Math.sin(oa);const ix=x+(r*0.382)*Math.cos(ia);const iy=y+(r*0.382)*Math.sin(ia);if(k===0)ctx.moveTo(ox,oy);else ctx.lineTo(ox,oy);ctx.lineTo(ix,iy);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();});});}};
 Chart.register(fivePointStarPlugin);
 
-// BITSTREAM
 function handleBSFile(i){state.bsFile=i.files[0];if(state.bsFile)document.getElementById('bs-filename').textContent=state.bsFile.name;}
-async function runBitstreamAnalysis(){if(!state.bsFile){alert('请先上传比特流文件');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='读取文件...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='解析...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='计算 ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));for(let k=0;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}document.getElementById('bs-progress-bar').style.width='95%';document.getElementById('bs-status').textContent='渲染...';await new Promise(r=>setTimeout(r,50));document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">【原理】</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">【步骤1】</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">【步骤2】</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);destroyChart('acf');
+async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));for(let k=0;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}document.getElementById('bs-progress-bar').style.width='95%';document.getElementById('bs-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">[Principle]</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 1]</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 2]</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);destroyChart('acf');state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{type:'scatter',data:{datasets:[{label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a',showLine:false,_drawStar:true,_starSize:8},{label:'95% CI',data:[{x:0,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'',data:[{x:0,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'y=0',data:[{x:0,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},scales:{x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'ACF',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`Done! ${actualN.toLocaleString()} bits`;}
 
-/* ACF chart: custom red five-pointed stars, hidden default points */
-state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{type:'scatter',data:{datasets:[{label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a',showLine:false,_drawStar:true,_starSize:8},{label:'95% CI',data:[{x:0,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'',data:[{x:0,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'y=0',data:[{x:0,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},scales:{x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'ACF',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});
-document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`完成! ${actualN.toLocaleString()} 比特`;}
-
-// ENCRYPTION
 function handleEncImg(i){state.encImgFile=i.files[0];if(state.encImgFile){document.getElementById('enc-img-name').textContent=state.encImgFile.name;loadImageFromFile(state.encImgFile).then(img=>{const area=document.getElementById('enc-preview-area');const c=document.getElementById('enc-orig-preview');area.classList.remove('hidden');const containerW=area.clientWidth-24;const ratio=img.naturalHeight/img.naturalWidth;const dispW=Math.min(containerW,400);const dispH=Math.round(dispW*ratio);c.width=dispW;c.height=dispH;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,dispW,dispH);});}}
 function handleEncKey(i){state.encKeyFile=i.files[0];if(state.encKeyFile)document.getElementById('enc-key-name').textContent=state.encKeyFile.name;}
-async function runEncryption(){if(!state.encImgFile||!state.encKeyFile){alert('请上传图像和密钥文件');return;}document.getElementById('enc-progress').classList.remove('hidden');document.getElementById('enc-status').textContent='加载...';document.getElementById('enc-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(state.encImgFile),keyText=await readFileAsText(state.encKeyFile),startBit=parseInt(document.getElementById('enc-start').value)||0,SIZE=512,origData=getImageData(img,SIZE),keyBits=parseBitstream(keyText,keyText.length);document.getElementById('enc-progress-bar').style.width='30%';document.getElementById('enc-status').textContent='加密中...';await new Promise(r=>setTimeout(r,50));const encData=xorProcess(origData,keyBits,startBit);document.getElementById('enc-progress-bar').style.width='60%';document.getElementById('enc-status').textContent='解密中...';await new Promise(r=>setTimeout(r,50));const decData=xorProcess(encData,keyBits,startBit);document.getElementById('enc-results').classList.remove('hidden');drawImageData(document.getElementById('enc-orig-canvas'),origData);drawImageData(document.getElementById('enc-enc-canvas'),encData);drawImageData(document.getElementById('enc-dec-canvas'),decData);const tp=SIZE*SIZE*3,rb=tp*8,au=Math.min(rb,keyBits.length-startBit);document.getElementById('enc-stats').innerHTML=`密钥: <span class="text-accent">${keyBits.length.toLocaleString()}</span> 比特<br>起始: <span style="color:#6366f1">${startBit}</span><br>所需: <span class="text-gold">${rb.toLocaleString()}</span><br>已用: <span class="text-accent">${au.toLocaleString()}</span><br>剩余: <span class="text-rose">${Math.max(0,keyBits.length-startBit-au).toLocaleString()}</span>`+(keyBits.length<rb?`<br>循环: <span class="text-gold">${Math.ceil(rb/keyBits.length)}</span>`:'');document.getElementById('enc-progress-bar').style.width='100%';document.getElementById('enc-status').textContent='完成!';}
+async function runEncryption(){if(!state.encImgFile||!state.encKeyFile){alert('Please upload both image and key file');return;}document.getElementById('enc-progress').classList.remove('hidden');document.getElementById('enc-status').textContent='Loading...';document.getElementById('enc-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(state.encImgFile),keyText=await readFileAsText(state.encKeyFile),startBit=parseInt(document.getElementById('enc-start').value)||0,SIZE=512,origData=getImageData(img,SIZE),keyBits=parseBitstream(keyText,keyText.length);document.getElementById('enc-progress-bar').style.width='30%';document.getElementById('enc-status').textContent='Encrypting...';await new Promise(r=>setTimeout(r,50));const encData=xorProcess(origData,keyBits,startBit);document.getElementById('enc-progress-bar').style.width='60%';document.getElementById('enc-status').textContent='Decrypting...';await new Promise(r=>setTimeout(r,50));const decData=xorProcess(encData,keyBits,startBit);document.getElementById('enc-results').classList.remove('hidden');drawImageData(document.getElementById('enc-orig-canvas'),origData);drawImageData(document.getElementById('enc-enc-canvas'),encData);drawImageData(document.getElementById('enc-dec-canvas'),decData);const tp=SIZE*SIZE*3,rb=tp*8,au=Math.min(rb,keyBits.length-startBit);document.getElementById('enc-stats').innerHTML=`Key: <span class="text-accent">${keyBits.length.toLocaleString()}</span> bits<br>Start: <span style="color:#6366f1">${startBit}</span><br>Required: <span class="text-gold">${rb.toLocaleString()}</span><br>Used: <span class="text-accent">${au.toLocaleString()}</span><br>Remaining: <span class="text-rose">${Math.max(0,keyBits.length-startBit-au).toLocaleString()}</span>`+(keyBits.length<rb?`<br>Cycles: <span class="text-gold">${Math.ceil(rb/keyBits.length)}</span>`:'');document.getElementById('enc-progress-bar').style.width='100%';document.getElementById('enc-status').textContent='Done!';}
 function xorProcess(imageData,keyBits,startBit){const data=new Uint8ClampedArray(imageData.data),keyLen=keyBits.length;let idx=startBit;for(let i=0;i<data.length;i+=4)for(let ch=0;ch<3;ch++){const val=data[i+ch];let result=0;for(let b=7;b>=0;b--){const bit=(val>>b)&1,keyBit=idx<keyLen?keyBits[idx]:0;result|=(bit^keyBit)<<b;idx++;}data[i+ch]=result;}return new ImageData(data,imageData.width,imageData.height);}
 
-// STATISTICS — 6 histogram cards + 6 correlation cards
 async function runStatAnalysis(){
   const origFile=document.getElementById('stat-orig').files[0],encFile=document.getElementById('stat-enc').files[0];
-  if(!origFile||!encFile){alert('请上传原始图像和加密图像');return;}
+  if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}
   const numPairs=parseInt(document.getElementById('stat-pairs').value)||3000;
   const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512);
   const origHist=calcHistogram(origData),encHist=calcHistogram(encData);
   const origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);
   document.getElementById('stat-results').classList.remove('hidden');
-
-  /* --- 6 Histogram charts: 3 orig + 3 enc, each single channel --- */
-  const histCfg = [
-    {key:'r',label:'Red',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},
-    {key:'g',label:'Green',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},
-    {key:'b',label:'Blue',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}
-  ];
-  histCfg.forEach(ch=>{
-    destroyChart(ch.origId);
-    state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'像素频率',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});
-    destroyChart(ch.encId);
-    state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'像素频率',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});
-  });
-
-  /* --- Original Correlation scatter plots --- */
+  const histCfg=[{key:'r',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},{key:'g',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},{key:'b',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}];
+  histCfg.forEach(ch=>{destroyChart(ch.origId);state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});destroyChart(ch.encId);state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});});
   const corrDirs=[{key:'horizontal',canvas:'corr-orig-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-orig-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-orig-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
   corrDirs.forEach(d=>{destroyChart(d.canvas);const pts=origCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(13,115,119,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
-
-  /* --- Encrypted Correlation scatter plots --- */
   const encCorrDirs=[{key:'horizontal',canvas:'corr-enc-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-enc-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-enc-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
   encCorrDirs.forEach(d=>{destroyChart(d.canvas);const pts=encCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(194,66,90,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
-
-  /* --- Correlation coefficient table --- */
-  let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">方向</th><th class="py-3 px-4 text-center" style="background:#faf8f5">原始 R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">原始 G</th><th class="py-3 px-4 text-center" style="background:#faf8f5">原始 B</th><th class="py-3 px-4 text-center" style="background:#faf8f5">加密 R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">加密 G</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">加密 B</th></tr></thead><tbody>';
-  ['horizontal','vertical','diagonal'].forEach((dir,idx)=>{const names={horizontal:'水平',vertical:'垂直',diagonal:'对角线'};const bg=idx%2===0?'#fff':'#faf8f5';t+=`<tr style="background:${bg}"><td class="py-3 px-4 text-ink font-medium">${names[dir]}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});
+  let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Direction</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig G</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig B</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc G</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Enc B</th></tr></thead><tbody>';
+  ['horizontal','vertical','diagonal'].forEach((dir,idx)=>{const bg=idx%2===0?'#fff':'#faf8f5';t+=`<tr style="background:${bg}"><td class="py-3 px-4 text-ink font-medium">${dir.charAt(0).toUpperCase()+dir.slice(1)}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});
   document.getElementById('corr-table').innerHTML=t+'</tbody></table>';
 }
 function calcHistogram(imageData){const h={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};const d=imageData.data;for(let i=0;i<d.length;i+=4){h.r[d[i]]++;h.g[d[i+1]]++;h.b[d[i+2]]++;}return h;}
 function calcCorrelation(imageData,numPairs){const d=imageData.data,w=imageData.width,h=imageData.height;const result={horizontal:[],vertical:[],diagonal:[],horizontal_vals:{},vertical_vals:{},diagonal_vals:{}};const dirs=[{name:'horizontal',gen:()=>{const i=Math.floor(Math.random()*h),j=Math.floor(Math.random()*(w-1));return[[i,j],[i,j+1]];},},{name:'vertical',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*w);return[[i,j],[i+1,j]];},},{name:'diagonal',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*(w-1));return[[i,j],[i+1,j+1]];},}];const ppd=Math.floor(numPairs/3);dirs.forEach(dir=>{const r1=[],r2=[],g1=[],g2=[],b1=[],b2=[],pts=[];for(let p=0;p<ppd;p++){const[[i1,j1],[i2,j2]]=dir.gen();const i1x=(i1*w+j1)*4,i2x=(i2*w+j2)*4;r1.push(d[i1x]);r2.push(d[i2x]);g1.push(d[i1x+1]);g2.push(d[i2x+1]);b1.push(d[i1x+2]);b2.push(d[i2x+2]);pts.push({x:Math.round((d[i1x]+d[i1x+1]+d[i1x+2])/3),y:Math.round((d[i2x]+d[i2x+1]+d[i2x+2])/3)});}result[dir.name]=pts;result[dir.name+'_vals']={r:pearsonCorrelation(r1,r2),g:pearsonCorrelation(g1,g2),b:pearsonCorrelation(b1,b2)};});return result;}
 
-// FIDELITY
 async function runQualityAnalysis(){
   const origFile=document.getElementById('q-orig').files[0],encFile=document.getElementById('q-enc').files[0];
-  if(!origFile||!encFile){alert('请上传原始图像和加密图像');return;}
-  document.getElementById('q-progress').classList.remove('hidden');document.getElementById('q-status').textContent='加载...';document.getElementById('q-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));
+  if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}
+  document.getElementById('q-progress').classList.remove('hidden');document.getElementById('q-status').textContent='Loading...';document.getElementById('q-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));
   const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512),od=origData.data,ed=encData.data,M=512,N=512,totalPixels=M*N;
-  document.getElementById('q-progress-bar').style.width='15%';document.getElementById('q-status').textContent='计算差值...';await new Promise(r=>setTimeout(r,50));
+  document.getElementById('q-progress-bar').style.width='15%';document.getElementById('q-status').textContent='Computing differences...';await new Promise(r=>setTimeout(r,50));
   const diffR=new Float64Array(totalPixels),diffG=new Float64Array(totalPixels),diffB=new Float64Array(totalPixels);let minDiff=Infinity,maxDiff=-Infinity;
   for(let i=0;i<totalPixels;i++){const idx=i*4;diffR[i]=od[idx]-ed[idx];diffG[i]=od[idx+1]-ed[idx+1];diffB[i]=od[idx+2]-ed[idx+2];const mx=Math.max(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i])),mn=Math.min(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i]));if(mx>maxDiff)maxDiff=mx;if(mn<minDiff)minDiff=mn;}
-  document.getElementById('q-progress-bar').style.width='25%';document.getElementById('q-status').textContent='计算平方...';await new Promise(r=>setTimeout(r,50));
-  const sqR=new Float64Array(totalPixels),sqG=new Float64Array(totalPixels),sqB=new Float64Array(totalPixels);let minSq=Infinity,maxSq=-Infinity;
-  for(let i=0;i<totalPixels;i++){sqR[i]=diffR[i]**2;sqG[i]=diffG[i]**2;sqB[i]=diffB[i]**2;const mx=Math.max(sqR[i],sqG[i],sqB[i]),mn=Math.min(sqR[i],sqG[i],sqB[i]);if(mx>maxSq)maxSq=mx;if(mn<minSq)minSq=mn;}
-  document.getElementById('q-progress-bar').style.width='35%';document.getElementById('q-status').textContent='计算平方和...';await new Promise(r=>setTimeout(r,50));
+  document.getElementById('q-progress-bar').style.width='25%';document.getElementById('q-status').textContent='Computing squares...';await new Promise(r=>setTimeout(r,50));
+  const sqR=new Float64Array(totalPixels),sqG=new Float64Array(totalPixels),sqB=new Float64Array(totalPixels);
+  for(let i=0;i<totalPixels;i++){sqR[i]=diffR[i]**2;sqG[i]=diffG[i]**2;sqB[i]=diffB[i]**2;}
+  document.getElementById('q-progress-bar').style.width='35%';document.getElementById('q-status').textContent='Summing squares...';await new Promise(r=>setTimeout(r,50));
   let sumR=0,sumG=0,sumB=0,nzR=0,nzG=0,nzB=0;for(let i=0;i<totalPixels;i++){sumR+=sqR[i];sumG+=sqG[i];sumB+=sqB[i];if(sqR[i])nzR++;if(sqG[i])nzG++;if(sqB[i])nzB++;}
   const totalSum=sumR+sumG+sumB,totalNz=nzR+nzG+nzB;
   document.getElementById('q-progress-bar').style.width='45%';document.getElementById('q-status').textContent='MSE...';await new Promise(r=>setTimeout(r,50));
   const mseR=sumR/totalPixels,mseG=sumG/totalPixels,mseB=sumB/totalPixels,mseAll=totalSum/(3*totalPixels);
   document.getElementById('q-progress-bar').style.width='55%';document.getElementById('q-status').textContent='PSNR...';await new Promise(r=>setTimeout(r,50));
   const Imax=255,Imax2=Imax**2,eps=1e-10,psnrR=10*Math.log10(Imax2/(mseR+eps)),psnrG=10*Math.log10(Imax2/(mseG+eps)),psnrB=10*Math.log10(Imax2/(mseB+eps)),psnrAll=10*Math.log10(Imax2/(mseAll+eps));
-  document.getElementById('q-progress-bar').style.width='65%';document.getElementById('q-status').textContent='SSIM（请稍候）...';await new Promise(r=>setTimeout(r,50));
+  document.getElementById('q-progress-bar').style.width='65%';document.getElementById('q-status').textContent='SSIM (please wait)...';await new Promise(r=>setTimeout(r,50));
   const ws=parseInt(document.getElementById('ssim-window').value)||11,K1=parseFloat(document.getElementById('ssim-k1').value)||0.01,K2=parseFloat(document.getElementById('ssim-k2').value)||0.03,ssimR=computeSSIM(origData,encData,ws,K1,K2);
-  document.getElementById('q-progress-bar').style.width='95%';document.getElementById('q-status').textContent='渲染...';await new Promise(r=>setTimeout(r,50));
+  document.getElementById('q-progress-bar').style.width='95%';document.getElementById('q-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));
   document.getElementById('q-results').classList.remove('hidden');
   document.getElementById('mse-all-card').textContent=mseAll.toFixed(4);document.getElementById('psnr-all-card').textContent=psnrAll.toFixed(2)+' dB';document.getElementById('ssim-all-card').textContent=ssimR.all.toFixed(6);document.getElementById('diff-range').textContent=`[${minDiff.toFixed(0)}, ${maxDiff.toFixed(0)}]`;
   document.getElementById('mse-r').textContent=mseR.toFixed(6);document.getElementById('mse-g').textContent=mseG.toFixed(6);document.getElementById('mse-b').textContent=mseB.toFixed(6);document.getElementById('mse-all').textContent=mseAll.toFixed(6);
   document.getElementById('psnr-r').textContent=psnrR.toFixed(6)+' dB';document.getElementById('psnr-g').textContent=psnrG.toFixed(6)+' dB';document.getElementById('psnr-b').textContent=psnrB.toFixed(6)+' dB';document.getElementById('psnr-all').textContent=psnrAll.toFixed(6)+' dB';
   document.getElementById('ssim-r').textContent=ssimR.r.toFixed(6);document.getElementById('ssim-g').textContent=ssimR.g.toFixed(6);document.getElementById('ssim-b').textContent=ssimR.b.toFixed(6);document.getElementById('ssim-all').textContent=ssimR.all.toFixed(6);
   const fmt=v=>v.toLocaleString(undefined,{maximumFractionDigits:2});
-  document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">统计项</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">总计</th></tr></thead><tbody>`+
-    `<tr style="background:#fff"><td class="py-3 px-4">非零差值</td><td class="py-3 px-4 text-center">${nzR.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzG.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzB.toLocaleString()}</td><td class="py-3 px-4 text-center font-medium">${totalNz.toLocaleString()}</td></tr>`+
-    `<tr style="background:#faf8f5"><td class="py-3 px-4">平方和</td><td class="py-3 px-4 text-center">${fmt(sumR)}</td><td class="py-3 px-4 text-center">${fmt(sumG)}</td><td class="py-3 px-4 text-center">${fmt(sumB)}</td><td class="py-3 px-4 text-center font-medium">${fmt(totalSum)}</td></tr>`+
+  document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Statistic</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Total</th></tr></thead><tbody>`+
+    `<tr style="background:#fff"><td class="py-3 px-4">Non-zero Diffs</td><td class="py-3 px-4 text-center">${nzR.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzG.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzB.toLocaleString()}</td><td class="py-3 px-4 text-center font-medium">${totalNz.toLocaleString()}</td></tr>`+
+    `<tr style="background:#faf8f5"><td class="py-3 px-4">Sum of Squares</td><td class="py-3 px-4 text-center">${fmt(sumR)}</td><td class="py-3 px-4 text-center">${fmt(sumG)}</td><td class="py-3 px-4 text-center">${fmt(sumB)}</td><td class="py-3 px-4 text-center font-medium">${fmt(totalSum)}</td></tr>`+
     `<tr style="background:#fff"><td class="py-3 px-4">MSE</td><td class="py-3 px-4 text-center">${mseR.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseG.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseB.toFixed(6)}</td><td class="py-3 px-4 text-center text-gold font-bold">${mseAll.toFixed(6)}</td></tr>`+
     `<tr style="background:#faf8f5"><td class="py-3 px-4">PSNR (dB)</td><td class="py-3 px-4 text-center">${psnrR.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrG.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrB.toFixed(4)}</td><td class="py-3 px-4 text-center text-accent font-bold">${psnrAll.toFixed(4)}</td></tr>`+
     `<tr style="background:#fff"><td class="py-3 px-4 font-medium">SSIM</td><td class="py-3 px-4 text-center">${ssimR.r.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.g.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.b.toFixed(6)}</td><td class="py-3 px-4 text-center text-rose font-bold">${ssimR.all.toFixed(6)}</td></tr></tbody></table>`;
   const pv=10*Math.log10(Imax2/mseAll);
-  document.getElementById('q-detail').innerHTML=`<div class="text-accent mb-3 text-sm font-bold">===== 保真度分析 =====</div><div style="color:#6366f1" class="mb-2 font-bold">【参数】</div>${M}×${N}, 总像素${totalPixels.toLocaleString()}, Imax=${Imax}<br>SSIM窗口${ws}×${ws}, K1=${K1}, K2=${K2}<br><br><div class="text-accent mb-2 font-bold text-sm">===== MSE =====</div><span style="color:#c2425a">R:</span> ${mseR.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${mseG.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${mseB.toFixed(6)}<br><span class="text-gold font-bold">整体: ${mseAll.toFixed(6)}</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== PSNR =====</div><span style="color:#c2425a">R:</span> ${psnrR.toFixed(6)} dB<br><span style="color:#16a34a">G:</span> ${psnrG.toFixed(6)} dB<br><span style="color:#2563eb">B:</span> ${psnrB.toFixed(6)} dB<br><span class="text-accent font-bold">整体: ${psnrAll.toFixed(6)} dB</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== SSIM =====</div><span style="color:#c2425a">R:</span> ${ssimR.r.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${ssimR.g.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${ssimR.b.toFixed(6)}<br><span class="text-rose font-bold">整体: ${ssimR.all.toFixed(6)}</span><br><br><div class="text-muted font-bold">验证PSNR: ${pv.toFixed(6)} dB</div>`;
-  document.getElementById('q-progress-bar').style.width='100%';document.getElementById('q-status').textContent='完成!';
+  document.getElementById('q-detail').innerHTML=`<div class="text-accent mb-3 text-sm font-bold">===== Fidelity Analysis =====</div><div style="color:#6366f1" class="mb-2 font-bold">[Parameters]</div>${M}×${N}, Total pixels: ${totalPixels.toLocaleString()}, Imax=${Imax}<br>SSIM window: ${ws}×${ws}, K1=${K1}, K2=${K2}<br><br><div class="text-accent mb-2 font-bold text-sm">===== MSE =====</div><span style="color:#c2425a">R:</span> ${mseR.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${mseG.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${mseB.toFixed(6)}<br><span class="text-gold font-bold">Overall: ${mseAll.toFixed(6)}</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== PSNR =====</div><span style="color:#c2425a">R:</span> ${psnrR.toFixed(6)} dB<br><span style="color:#16a34a">G:</span> ${psnrG.toFixed(6)} dB<br><span style="color:#2563eb">B:</span> ${psnrB.toFixed(6)} dB<br><span class="text-accent font-bold">Overall: ${psnrAll.toFixed(6)} dB</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== SSIM =====</div><span style="color:#c2425a">R:</span> ${ssimR.r.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${ssimR.g.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${ssimR.b.toFixed(6)}<br><span class="text-rose font-bold">Overall: ${ssimR.all.toFixed(6)}</span><br><br><div class="text-muted font-bold">Verification PSNR: ${pv.toFixed(6)} dB</div>`;
+  document.getElementById('q-progress-bar').style.width='100%';document.getElementById('q-status').textContent='Done!';
 }
 
-// ROBUSTNESS
 async function runRobustnessTest(){
   const imgFile=document.getElementById('rob-img').files[0],keyFile=document.getElementById('rob-key').files[0];
-  if(!imgFile||!keyFile){alert('请上传图像和密钥文件');return;}
+  if(!imgFile||!keyFile){alert('Please upload both image and key file');return;}
   const noiseLevels=[];document.querySelectorAll('.rob-noise:checked').forEach(cb=>noiseLevels.push(parseFloat(cb.value)));
-  if(!noiseLevels.length){alert('请选择噪声比例');return;}noiseLevels.sort((a,b)=>a-b);
-  document.getElementById('rob-progress').classList.remove('hidden');document.getElementById('rob-status').textContent='加载...';document.getElementById('rob-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));
+  if(!noiseLevels.length){alert('Please select at least one noise ratio');return;}noiseLevels.sort((a,b)=>a-b);
+  document.getElementById('rob-progress').classList.remove('hidden');document.getElementById('rob-status').textContent='Loading...';document.getElementById('rob-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));
   const img=await loadImageFromFile(imgFile),keyText=await readFileAsText(keyFile),keyBits=parseBitstream(keyText,keyText.length),origData=getImageData(img,512);
-  document.getElementById('rob-progress-bar').style.width='15%';document.getElementById('rob-status').textContent='加密...';await new Promise(r=>setTimeout(r,50));
+  document.getElementById('rob-progress-bar').style.width='15%';document.getElementById('rob-status').textContent='Encrypting...';await new Promise(r=>setTimeout(r,50));
   const encData=xorProcess(origData,keyBits,0);const results=[];
-  for(let s=0;s<noiseLevels.length;s++){const pct=noiseLevels[s];document.getElementById('rob-status').textContent=`噪声 ${pct}% (${s+1}/${noiseLevels.length})...`;document.getElementById('rob-progress-bar').style.width=(15+(s/noiseLevels.length)*70)+'%';await new Promise(r=>setTimeout(r,50));const noisyEnc=addSaltPepperNoise(encData,pct),decData=xorProcess(noisyEnc,keyBits,0);const od=origData.data,dd=decData.data;let m=0;for(let i=0;i<od.length;i+=4)for(let c=0;c<3;c++){const d=od[i+c]-dd[i+c];m+=d*d;}const mse=m/(512*512*3),psnr=10*Math.log10(65025/(mse+1e-10));results.push({pct,decData,mse,psnr});}
-  document.getElementById('rob-progress-bar').style.width='95%';document.getElementById('rob-status').textContent='渲染...';await new Promise(r=>setTimeout(r,50));
+  for(let s=0;s<noiseLevels.length;s++){const pct=noiseLevels[s];document.getElementById('rob-status').textContent=`Noise ${pct}% (${s+1}/${noiseLevels.length})...`;document.getElementById('rob-progress-bar').style.width=(15+(s/noiseLevels.length)*70)+'%';await new Promise(r=>setTimeout(r,50));const noisyEnc=addSaltPepperNoise(encData,pct),decData=xorProcess(noisyEnc,keyBits,0);const od=origData.data,dd=decData.data;let m=0;for(let i=0;i<od.length;i+=4)for(let c=0;c<3;c++){const d=od[i+c]-dd[i+c];m+=d*d;}const mse=m/(512*512*3),psnr=10*Math.log10(65025/(mse+1e-10));results.push({pct,decData,mse,psnr});}
+  document.getElementById('rob-progress-bar').style.width='95%';document.getElementById('rob-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));
   document.getElementById('rob-results').classList.remove('hidden');
   const gallery=document.getElementById('rob-gallery');gallery.innerHTML='';gallery.style.gridTemplateColumns=`repeat(${Math.min(results.length,5)},1fr)`;
-  results.forEach((r,idx)=>{const card=document.createElement('div');card.className='rob-card fade-in';card.style.animationDelay=(idx*0.08)+'s';const info=document.createElement('div');info.className='px-5 pt-5 pb-3';const pc=r.psnr>30?'#16a34a':r.psnr>20?'#c49a2a':r.psnr>10?'#ea580c':'#c2425a';info.innerHTML=`<div class="flex items-baseline justify-between mb-3"><span class="font-display font-800 text-lg text-ink">噪声 ${r.pct}%</span><span class="font-mono text-[10px] text-muted uppercase">Noise Level</span></div><div class="flex items-baseline gap-2 mb-2"><span class="font-display font-800 text-3xl" style="color:${pc}">${r.psnr.toFixed(2)}</span><span class="font-mono text-sm text-muted">dB</span></div><div class="flex gap-2"><span class="font-mono text-xs px-3 py-1 rounded-full bg-sand text-muted">MSE ${r.mse.toFixed(1)}</span></div>`;card.appendChild(info);const canvas=document.createElement('canvas');canvas.width=r.decData.width;canvas.height=r.decData.height;canvas.style.cssText='width:100%;display:block;image-rendering:pixelated;border-top:1px solid #e2ddd5;';canvas.getContext('2d').putImageData(r.decData,0,0);card.appendChild(canvas);gallery.appendChild(card);});
-  destroyChart('rob-psnr');state.charts['rob-psnr']=new Chart(document.getElementById('rob-psnr-chart'),{type:'line',data:{labels:results.map(r=>r.pct+'%'),datasets:[{label:'PSNR (dB)',data:results.map(r=>r.psnr),borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.08)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#0d7377',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},scales:{x:{title:{display:true,text:'噪声比例',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'PSNR (dB)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});
-  document.getElementById('rob-progress-bar').style.width='100%';document.getElementById('rob-status').textContent=`完成! ${results.length} 个噪声比例`;
+  results.forEach((r,idx)=>{const card=document.createElement('div');card.className='rob-card fade-in';card.style.animationDelay=(idx*0.08)+'s';const info=document.createElement('div');info.className='px-5 pt-5 pb-3';const pc=r.psnr>30?'#16a34a':r.psnr>20?'#c49a2a':r.psnr>10?'#ea580c':'#c2425a';info.innerHTML=`<div class="flex items-baseline justify-between mb-3"><span class="font-display font-800 text-lg text-ink">Noise ${r.pct}%</span><span class="font-mono text-[10px] text-muted uppercase">Level</span></div><div class="flex items-baseline gap-2 mb-2"><span class="font-display font-800 text-3xl" style="color:${pc}">${r.psnr.toFixed(2)}</span><span class="font-mono text-sm text-muted">dB</span></div><div class="flex gap-2"><span class="font-mono text-xs px-3 py-1 rounded-full bg-sand text-muted">MSE ${r.mse.toFixed(1)}</span></div>`;card.appendChild(info);const canvas=document.createElement('canvas');canvas.width=r.decData.width;canvas.height=r.decData.height;canvas.style.cssText='width:100%;display:block;image-rendering:pixelated;border-top:1px solid #e2ddd5;';canvas.getContext('2d').putImageData(r.decData,0,0);card.appendChild(canvas);gallery.appendChild(card);});
+  destroyChart('rob-psnr');state.charts['rob-psnr']=new Chart(document.getElementById('rob-psnr-chart'),{type:'line',data:{labels:results.map(r=>r.pct+'%'),datasets:[{label:'PSNR (dB)',data:results.map(r=>r.psnr),borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.08)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#0d7377',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},scales:{x:{title:{display:true,text:'Noise Ratio',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'PSNR (dB)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});
+  document.getElementById('rob-progress-bar').style.width='100%';document.getElementById('rob-status').textContent=`Done! ${results.length} noise levels`;
 }
 function addSaltPepperNoise(imageData,p){const data=new Uint8ClampedArray(imageData.data),tp=imageData.width*imageData.height,nn=Math.floor(tp*p/100);for(let n=0;n<nn;n++){const idx=Math.floor(Math.random()*tp)*4;if(Math.random()<.5){data[idx]=255;data[idx+1]=255;data[idx+2]=255;}else{data[idx]=0;data[idx+1]=0;data[idx+2]=0;}}return new ImageData(data,imageData.width,imageData.height);}
 
