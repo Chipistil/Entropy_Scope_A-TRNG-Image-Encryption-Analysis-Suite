@@ -178,7 +178,7 @@
         </div>
         <div class="card p-6 fade-in">
           <h3 class="font-display font-700 text-base text-ink mb-1">Autocorrelation Function (ACF)</h3>
-          <p class="font-body text-xs text-muted mb-4">Measures autocorrelation at different lags; ideal values should fall within the 95% confidence interval</p>
+          <p class="font-body text-xs text-muted mb-4">Measures autocorrelation at different lags (lag ≥ 1); ideal values should fall within the 95% confidence interval</p>
           <canvas id="bs-acf-chart" height="120"></canvas>
         </div>
       </div>
@@ -362,7 +362,8 @@
         </div>
         <p class="font-body text-sm text-muted">Add salt-and-pepper noise at different ratios to the encrypted image, then decrypt to evaluate noise resistance</p>
       </div>
-      <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 2fr">
+      <!-- CHANGE: ratio 1fr 1fr 1.8fr -->
+      <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.8fr">
         <div class="card p-6 fade-in flex flex-col">
           <h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3>
           <p class="font-body text-xs text-muted mb-3">Select the image to test</p>
@@ -417,7 +418,43 @@ const fivePointStarPlugin={id:'fivePointStar',afterDatasetsDraw(chart){chart.dat
 Chart.register(fivePointStarPlugin);
 
 function handleBSFile(i){state.bsFile=i.files[0];if(state.bsFile)document.getElementById('bs-filename').textContent=state.bsFile.name;}
-async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));for(let k=0;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}document.getElementById('bs-progress-bar').style.width='95%';document.getElementById('bs-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">[Principle]</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 1]</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 2]</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);destroyChart('acf');state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{type:'scatter',data:{datasets:[{label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a',showLine:false,_drawStar:true,_starSize:8},{label:'95% CI',data:[{x:0,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'',data:[{x:0,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'y=0',data:[{x:0,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},scales:{x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'ACF',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`Done! ${actualN.toLocaleString()} bits`;}
+async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));
+for(let k=1;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}
+document.getElementById('bs-progress-bar').style.width='95%';document.getElementById('bs-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">[Principle]</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 1]</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 2]</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);
+
+destroyChart('acf');
+state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{
+  type:'scatter',
+  data:{
+    datasets:[
+      {label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a',showLine:false,_drawStar:true,_starSize:8},
+      {label:'+95% CI',data:[{x:1,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},
+      {label:'−95% CI',data:[{x:1,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},
+      {label:'y = 0',data:[{x:1,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}
+    ]
+  },
+  options:{
+    responsive:true,
+    plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},
+    scales:{
+      x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},
+      y:{
+        min:-0.05,
+        max:0.05,
+        title:{display:true,text:'ACF',font:{family:'Arial',size:11}},
+        grid:{color:'#e8e4dc'},
+        ticks:{
+          stepSize:0.01,
+          font:{family:'Arial',size:10},
+          color:'#94a3b8',
+          callback:function(v){return v.toFixed(2);}
+        }
+      }
+    }
+  }
+});
+
+document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`Done! ${actualN.toLocaleString()} bits`;}
 
 function handleEncImg(i){state.encImgFile=i.files[0];if(state.encImgFile){document.getElementById('enc-img-name').textContent=state.encImgFile.name;loadImageFromFile(state.encImgFile).then(img=>{const area=document.getElementById('enc-preview-area');const c=document.getElementById('enc-orig-preview');area.classList.remove('hidden');const containerW=area.clientWidth-24;const ratio=img.naturalHeight/img.naturalWidth;const dispW=Math.min(containerW,400);const dispH=Math.round(dispW*ratio);c.width=dispW;c.height=dispH;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,dispW,dispH);});}}
 function handleEncKey(i){state.encKeyFile=i.files[0];if(state.encKeyFile)document.getElementById('enc-key-name').textContent=state.encKeyFile.name;}
