@@ -362,8 +362,8 @@
         </div>
         <p class="font-body text-sm text-muted">Add salt-and-pepper noise at different ratios to the encrypted image, then decrypt to evaluate noise resistance</p>
       </div>
-      <!-- CHANGE: ratio 1fr 1fr 1.8fr -->
-      <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.8fr">
+      <!-- CHANGE: 1fr 1fr 1.6fr -->
+      <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.6fr">
         <div class="card p-6 fade-in flex flex-col">
           <h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3>
           <p class="font-body text-xs text-muted mb-3">Select the image to test</p>
@@ -439,15 +439,15 @@ state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{
     scales:{
       x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},
       y:{
-        min:-0.05,
-        max:0.05,
+        min:-0.02,
+        max:0.02,
         title:{display:true,text:'ACF',font:{family:'Arial',size:11}},
         grid:{color:'#e8e4dc'},
         ticks:{
-          stepSize:0.01,
+          stepSize:0.005,
           font:{family:'Arial',size:10},
           color:'#94a3b8',
-          callback:function(v){return v.toFixed(2);}
+          callback:function(v){return v.toFixed(3);}
         }
       }
     }
