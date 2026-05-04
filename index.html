@@ -265,32 +265,85 @@
       </div>
     </section>
 
-    <!-- Fidelity Analysis -->
+    <!-- Fidelity Analysis (REPLACED) -->
     <section id="sec-quality" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">04</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Fidelity Analysis</h2></div><p class="font-body text-sm text-muted">Compute MSE, PSNR, and SSIM between original and encrypted images</p></div>
-      <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">Click to upload</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">Click to upload</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
+      <div class="mb-8 fade-in">
+        <div class="flex items-center gap-3 mb-1">
+          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">04</span></span>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Fidelity Analysis</h2>
+        </div>
+        <p class="font-body text-sm text-muted">Compute MSE, PSNR, and SSIM between original and encrypted images</p>
       </div>
-      <div class="card p-6 mb-6 fade-in"><h3 class="font-display font-700 text-sm text-ink mb-4">SSIM Parameters</h3><div class="grid grid-cols-3 gap-5"><div><label class="font-mono text-xs text-muted block mb-2 uppercase">Window</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8x8</option><option value="11" selected>11x11</option><option value="16">16x16</option></select></div><div><label class="font-mono text-xs text-muted block mb-2 uppercase">K1</label><input type="number" id="ssim-k1" value="0.01" step="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div><div><label class="font-mono text-xs text-muted block mb-2 uppercase">K2</label><input type="number" id="ssim-k2" value="0.03" step="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div></div></div>
-      <button onclick="runQualityAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5"><span class="flex items-center gap-2">Compute MSE & PSNR & SSIM</span></button>
+      <div class="grid grid-cols-2 gap-6 mb-6">
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">Click to upload original image</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">Click to upload encrypted image</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
+      </div>
+      <div class="card p-6 mb-6 fade-in">
+        <h3 class="font-display font-700 text-sm text-ink mb-4">SSIM Parameter Configuration</h3>
+        <div class="grid grid-cols-3 gap-5">
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Window Size</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8x8</option><option value="11" selected>11x11</option><option value="16">16x16</option></select></div>
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K1</label><input type="number" id="ssim-k1" value="0.01" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
+          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K2</label><input type="number" id="ssim-k2" value="0.03" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
+        </div>
+      </div>
+      <button onclick="runQualityAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
+        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Compute MSE & PSNR & SSIM</span>
+      </button>
       <div id="q-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="q-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="q-status">Processing...</p></div>
       <div id="q-results" class="hidden">
         <div class="grid grid-cols-5 gap-4 mb-8 fade-in">
-          <div class="stat-card card p-5" style="--accent-line:#c49a2a"><p class="font-mono text-xs text-muted uppercase mb-2">MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#0d7377"><p class="font-mono text-xs text-muted uppercase mb-2">PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#c2425a"><p class="font-mono text-xs text-muted uppercase mb-2">SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#6366f1"><p class="font-mono text-xs text-muted uppercase mb-2">Diff Range</p><p class="font-display font-700 text-lg" style="color:#6366f1" id="diff-range">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#7a7570"><p class="font-mono text-xs text-muted uppercase mb-2">Size</p><p class="font-display font-700 text-lg text-ink" id="img-size-info">512x512</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p><p class="font-mono text-xs text-muted mt-1">dB</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Diff Range</p><p class="font-display font-700 text-lg mt-1" style="color:#6366f1" id="diff-range">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#7a7570;--accent-glow:rgba(122,117,112,.06)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Image Size</p><p class="font-display font-700 text-lg text-ink mt-1" id="img-size-info">512x512</p></div>
         </div>
-        <div class="card p-6 mb-8 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Channel Details</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
+
+        <div class="fancy-divider"><span>Channel Breakdown</span></div>
+        <div class="grid grid-cols-3 gap-5 mb-8 fade-in" style="animation-delay:.05s">
+          <div class="card p-6">
+            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#c2425a"></span> MSE</h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="mse-r">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="mse-g">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="mse-b">—</span></div>
+              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-gold" id="mse-all">—</span></div>
+            </div>
+          </div>
+          <div class="card p-6">
+            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-accent"></span> PSNR</h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="psnr-r">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="psnr-g">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="psnr-b">—</span></div>
+              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-accent" id="psnr-all">—</span></div>
+            </div>
+          </div>
+          <div class="card p-6">
+            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-rose"></span> SSIM</h3>
+            <div class="space-y-4">
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="ssim-r">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="ssim-g">—</span></div>
+              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="ssim-b">—</span></div>
+              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-rose" id="ssim-all">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-6 mb-8 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-4">Channel Detail Statistics</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
+        <div class="card p-6 fade-in" style="animation-delay:.15s"><h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
       </div>
     </section>
 
     <!-- Robustness Test -->
     <section id="sec-robustness" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">05</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Robustness Test</h2></div><p class="font-body text-sm text-muted">Add salt-and-pepper noise to encrypted image, decrypt, and evaluate noise resistance</p></div>
+      <div class="mb-8 fade-in">
+        <div class="flex items-center gap-3 mb-1">
+          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">05</span></span>
+          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Robustness Test</h2>
+        </div>
+        <p class="font-body text-sm text-muted">Add salt-and-pepper noise to encrypted image, decrypt, and evaluate noise resistance</p>
+      </div>
       <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.6fr">
         <div class="card p-6 fade-in flex flex-col"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><p class="font-body text-xs text-muted mb-3">Select image</p><div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-img').click()"><p class="text-sm text-ink font-medium" id="rob-img-name">Upload</p></div><input type="file" id="rob-img" class="hidden" accept="image/*"></div>
         <div class="card p-6 fade-in flex flex-col" style="animation-delay:.06s"><h3 class="font-display font-700 text-base text-ink mb-2">Key Bitstream</h3><p class="font-body text-xs text-muted mb-3">Key file</p><div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-key').click()"><p class="text-sm text-ink font-medium" id="rob-key-name">Upload .txt</p></div><input type="file" id="rob-key" class="hidden" accept=".txt"></div>
@@ -380,7 +433,92 @@ async function runStatAnalysis(){
 function calcHistogram(imageData){const h={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};const d=imageData.data;for(let i=0;i<d.length;i+=4){h.r[d[i]]++;h.g[d[i+1]]++;h.b[d[i+2]]++;}return h;}
 function calcCorrelation(imageData,numPairs){const d=imageData.data,w=imageData.width,h=imageData.height;const result={horizontal:[],vertical:[],diagonal:[],horizontal_vals:{},vertical_vals:{},diagonal_vals:{}};const dirs=[{name:'horizontal',gen:()=>{const i=Math.floor(Math.random()*h),j=Math.floor(Math.random()*(w-1));return[[i,j],[i,j+1]];},},{name:'vertical',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*w);return[[i,j],[i+1,j]];},},{name:'diagonal',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*(w-1));return[[i,j],[i+1,j+1]];},}];const ppd=Math.floor(numPairs/3);dirs.forEach(dir=>{const r1=[],r2=[],g1=[],g2=[],b1=[],b2=[],pts=[];for(let p=0;p<ppd;p++){const[[i1,j1],[i2,j2]]=dir.gen();const i1x=(i1*w+j1)*4,i2x=(i2*w+j2)*4;r1.push(d[i1x]);r2.push(d[i2x]);g1.push(d[i1x+1]);g2.push(d[i2x+1]);b1.push(d[i1x+2]);b2.push(d[i2x+2]);pts.push({x:Math.round((d[i1x]+d[i1x+1]+d[i1x+2])/3),y:Math.round((d[i2x]+d[i2x+1]+d[i2x+2])/3)});}result[dir.name]=pts;result[dir.name+'_vals']={r:pearsonCorrelation(r1,r2),g:pearsonCorrelation(g1,g2),b:pearsonCorrelation(b1,b2)};});return result;}
 
-async function runQualityAnalysis(){const origFile=document.getElementById('q-orig').files[0],encFile=document.getElementById('q-enc').files[0];if(!origFile||!encFile){alert('Upload both');return;}document.getElementById('q-progress').classList.remove('hidden');document.getElementById('q-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512),od=origData.data,ed=encData.data,totalPixels=512*512;let sumR=0,sumG=0,sumB=0;for(let i=0;i<totalPixels;i++){const idx=i*4;sumR+=(od[idx]-ed[idx])**2;sumG+=(od[idx+1]-ed[idx+1])**2;sumB+=(od[idx+2]-ed[idx+2])**2;}document.getElementById('q-progress-bar').style.width='50%';const mseR=sumR/totalPixels,mseG=sumG/totalPixels,mseB=sumB/totalPixels,mseAll=(sumR+sumG+sumB)/(3*totalPixels);const I2=65025,eps=1e-10,psnrR=10*Math.log10(I2/(mseR+eps)),psnrG=10*Math.log10(I2/(mseG+eps)),psnrB=10*Math.log10(I2/(mseB+eps)),psnrAll=10*Math.log10(I2/(mseAll+eps));document.getElementById('q-progress-bar').style.width='65%';const ws=parseInt(document.getElementById('ssim-window').value)||11,K1=parseFloat(document.getElementById('ssim-k1').value)||0.01,K2=parseFloat(document.getElementById('ssim-k2').value)||0.03,ssimR=computeSSIM(origData,encData,ws,K1,K2);document.getElementById('q-results').classList.remove('hidden');document.getElementById('mse-all-card').textContent=mseAll.toFixed(4);document.getElementById('psnr-all-card').textContent=psnrAll.toFixed(2)+' dB';document.getElementById('ssim-all-card').textContent=ssimR.all.toFixed(6);document.getElementById('mse-r').textContent=mseR.toFixed(6);document.getElementById('mse-g').textContent=mseG.toFixed(6);document.getElementById('mse-b').textContent=mseB.toFixed(6);document.getElementById('mse-all').textContent=mseAll.toFixed(6);document.getElementById('psnr-r').textContent=psnrR.toFixed(4)+' dB';document.getElementById('psnr-g').textContent=psnrG.toFixed(4)+' dB';document.getElementById('psnr-b').textContent=psnrB.toFixed(4)+' dB';document.getElementById('psnr-all').textContent=psnrAll.toFixed(4)+' dB';document.getElementById('ssim-r').textContent=ssimR.r.toFixed(6);document.getElementById('ssim-g').textContent=ssimR.g.toFixed(6);document.getElementById('ssim-b').textContent=ssimR.b.toFixed(6);document.getElementById('ssim-all').textContent=ssimR.all.toFixed(6);document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Stat</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Total</th></tr></thead><tbody><tr style="background:#fff"><td class="py-3 px-4">MSE</td><td class="py-3 px-4 text-center">${mseR.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseG.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseB.toFixed(6)}</td><td class="py-3 px-4 text-center text-gold font-bold">${mseAll.toFixed(6)}</td></tr><tr style="background:#faf8f5"><td class="py-3 px-4">PSNR</td><td class="py-3 px-4 text-center">${psnrR.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrG.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrB.toFixed(4)}</td><td class="py-3 px-4 text-center text-accent font-bold">${psnrAll.toFixed(4)}</td></tr><tr style="background:#fff"><td class="py-3 px-4">SSIM</td><td class="py-3 px-4 text-center">${ssimR.r.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.g.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.b.toFixed(6)}</td><td class="py-3 px-4 text-center text-rose font-bold">${ssimR.all.toFixed(6)}</td></tr></tbody></table>`;document.getElementById('q-progress-bar').style.width='100%';document.getElementById('q-status').textContent='Done!';}
+/* ========== Fidelity Analysis (REPLACED) ========== */
+async function runQualityAnalysis(){
+  const origFile=document.getElementById('q-orig').files[0],encFile=document.getElementById('q-enc').files[0];
+  if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}
+  document.getElementById('q-progress').classList.remove('hidden');
+  document.getElementById('q-status').textContent='Loading...';
+  document.getElementById('q-progress-bar').style.width='5%';
+  await new Promise(r=>setTimeout(r,50));
+  const origData=getImageData(await loadImageFromFile(origFile),512),
+        encData=getImageData(await loadImageFromFile(encFile),512),
+        od=origData.data,ed=encData.data,M=512,N=512,totalPixels=M*N;
+  document.getElementById('q-progress-bar').style.width='15%';
+  document.getElementById('q-status').textContent='Computing differences...';
+  await new Promise(r=>setTimeout(r,50));
+  const diffR=new Float64Array(totalPixels),diffG=new Float64Array(totalPixels),diffB=new Float64Array(totalPixels);
+  let minDiff=Infinity,maxDiff=-Infinity;
+  for(let i=0;i<totalPixels;i++){
+    const idx=i*4;
+    diffR[i]=od[idx]-ed[idx];diffG[i]=od[idx+1]-ed[idx+1];diffB[i]=od[idx+2]-ed[idx+2];
+    const mx=Math.max(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i])),
+          mn=Math.min(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i]));
+    if(mx>maxDiff)maxDiff=mx;if(mn<minDiff)minDiff=mn;
+  }
+  document.getElementById('q-progress-bar').style.width='25%';
+  document.getElementById('q-status').textContent='Computing squares...';
+  await new Promise(r=>setTimeout(r,50));
+  const sqR=new Float64Array(totalPixels),sqG=new Float64Array(totalPixels),sqB=new Float64Array(totalPixels);
+  for(let i=0;i<totalPixels;i++){sqR[i]=diffR[i]**2;sqG[i]=diffG[i]**2;sqB[i]=diffB[i]**2;}
+  document.getElementById('q-progress-bar').style.width='35%';
+  document.getElementById('q-status').textContent='Summing squares...';
+  await new Promise(r=>setTimeout(r,50));
+  let sumR=0,sumG=0,sumB=0,nzR=0,nzG=0,nzB=0;
+  for(let i=0;i<totalPixels;i++){
+    sumR+=sqR[i];sumG+=sqG[i];sumB+=sqB[i];
+    if(sqR[i])nzR++;if(sqG[i])nzG++;if(sqB[i])nzB++;
+  }
+  const totalSum=sumR+sumG+sumB,totalNz=nzR+nzG+nzB;
+  document.getElementById('q-progress-bar').style.width='45%';
+  document.getElementById('q-status').textContent='MSE...';
+  await new Promise(r=>setTimeout(r,50));
+  const mseR=sumR/totalPixels,mseG=sumG/totalPixels,mseB=sumB/totalPixels,mseAll=totalSum/(3*totalPixels);
+  document.getElementById('q-progress-bar').style.width='55%';
+  document.getElementById('q-status').textContent='PSNR...';
+  await new Promise(r=>setTimeout(r,50));
+  const Imax=255,Imax2=Imax**2,eps=1e-10,
+        psnrR=10*Math.log10(Imax2/(mseR+eps)),psnrG=10*Math.log10(Imax2/(mseG+eps)),
+        psnrB=10*Math.log10(Imax2/(mseB+eps)),psnrAll=10*Math.log10(Imax2/(mseAll+eps));
+  document.getElementById('q-progress-bar').style.width='65%';
+  document.getElementById('q-status').textContent='SSIM (please wait)...';
+  await new Promise(r=>setTimeout(r,50));
+  const ws=parseInt(document.getElementById('ssim-window').value)||11,
+        K1=parseFloat(document.getElementById('ssim-k1').value)||0.01,
+        K2=parseFloat(document.getElementById('ssim-k2').value)||0.03,
+        ssimR=computeSSIM(origData,encData,ws,K1,K2);
+  document.getElementById('q-progress-bar').style.width='95%';
+  document.getElementById('q-status').textContent='Rendering...';
+  await new Promise(r=>setTimeout(r,50));
+  document.getElementById('q-results').classList.remove('hidden');
+  document.getElementById('mse-all-card').textContent=mseAll.toFixed(4);
+  document.getElementById('psnr-all-card').textContent=psnrAll.toFixed(2)+' dB';
+  document.getElementById('ssim-all-card').textContent=ssimR.all.toFixed(6);
+  document.getElementById('diff-range').textContent=`[${minDiff.toFixed(0)}, ${maxDiff.toFixed(0)}]`;
+  document.getElementById('mse-r').textContent=mseR.toFixed(6);
+  document.getElementById('mse-g').textContent=mseG.toFixed(6);
+  document.getElementById('mse-b').textContent=mseB.toFixed(6);
+  document.getElementById('mse-all').textContent=mseAll.toFixed(6);
+  document.getElementById('psnr-r').textContent=psnrR.toFixed(6)+' dB';
+  document.getElementById('psnr-g').textContent=psnrG.toFixed(6)+' dB';
+  document.getElementById('psnr-b').textContent=psnrB.toFixed(6)+' dB';
+  document.getElementById('psnr-all').textContent=psnrAll.toFixed(6)+' dB';
+  document.getElementById('ssim-r').textContent=ssimR.r.toFixed(6);
+  document.getElementById('ssim-g').textContent=ssimR.g.toFixed(6);
+  document.getElementById('ssim-b').textContent=ssimR.b.toFixed(6);
+  document.getElementById('ssim-all').textContent=ssimR.all.toFixed(6);
+  const fmt=v=>v.toLocaleString(undefined,{maximumFractionDigits:2});
+  document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Statistic</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Total</th></tr></thead><tbody>`+
+  `<tr style="background:#fff"><td class="py-3 px-4">Non-zero Diffs</td><td class="py-3 px-4 text-center">${nzR.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzG.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzB.toLocaleString()}</td><td class="py-3 px-4 text-center font-medium">${totalNz.toLocaleString()}</td></tr>`+
+  `<tr style="background:#faf8f5"><td class="py-3 px-4">Sum of Squares</td><td class="py-3 px-4 text-center">${fmt(sumR)}</td><td class="py-3 px-4 text-center">${fmt(sumG)}</td><td class="py-3 px-4 text-center">${fmt(sumB)}</td><td class="py-3 px-4 text-center font-medium">${fmt(totalSum)}</td></tr>`+
+  `<tr style="background:#fff"><td class="py-3 px-4">MSE</td><td class="py-3 px-4 text-center">${mseR.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseG.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseB.toFixed(6)}</td><td class="py-3 px-4 text-center text-gold font-bold">${mseAll.toFixed(6)}</td></tr>`+
+  `<tr style="background:#faf8f5"><td class="py-3 px-4">PSNR (dB)</td><td class="py-3 px-4 text-center">${psnrR.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrG.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrB.toFixed(4)}</td><td class="py-3 px-4 text-center text-accent font-bold">${psnrAll.toFixed(4)}</td></tr>`+
+  `<tr style="background:#fff"><td class="py-3 px-4 font-medium">SSIM</td><td class="py-3 px-4 text-center">${ssimR.r.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.g.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.b.toFixed(6)}</td><td class="py-3 px-4 text-center text-rose font-bold">${ssimR.all.toFixed(6)}</td></tr></tbody></table>`;
+  const pv=10*Math.log10(Imax2/mseAll);
+  document.getElementById('q-detail').innerHTML=`<div class="text-accent mb-3 text-sm font-bold">===== Fidelity Analysis =====</div><div style="color:#6366f1" class="mb-2 font-bold">[Parameters]</div>${M}x${N}, Total pixels: ${totalPixels.toLocaleString()}, Imax=${Imax}<br>SSIM window: ${ws}x${ws}, K1=${K1}, K2=${K2}<br><br><div class="text-accent mb-2 font-bold text-sm">===== MSE =====</div><span style="color:#c2425a">R:</span> ${mseR.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${mseG.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${mseB.toFixed(6)}<br><span class="text-gold font-bold">Overall: ${mseAll.toFixed(6)}</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== PSNR =====</div><span style="color:#c2425a">R:</span> ${psnrR.toFixed(6)} dB<br><span style="color:#16a34a">G:</span> ${psnrG.toFixed(6)} dB<br><span style="color:#2563eb">B:</span> ${psnrB.toFixed(6)} dB<br><span class="text-accent font-bold">Overall: ${psnrAll.toFixed(6)} dB</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== SSIM =====</div><span style="color:#c2425a">R:</span> ${ssimR.r.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${ssimR.g.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${ssimR.b.toFixed(6)}<br><span class="text-rose font-bold">Overall: ${ssimR.all.toFixed(6)}</span><br><br><div class="text-muted font-bold">Verification PSNR: ${pv.toFixed(6)} dB</div>`;
+  document.getElementById('q-progress-bar').style.width='100%';
+  document.getElementById('q-status').textContent='Done!';
+}
 
 async function runRobustnessTest(){const imgFile=document.getElementById('rob-img').files[0],keyFile=document.getElementById('rob-key').files[0];if(!imgFile||!keyFile){alert('Upload both');return;}const noiseLevels=[];document.querySelectorAll('.rob-noise:checked').forEach(cb=>noiseLevels.push(parseFloat(cb.value)));if(!noiseLevels.length){alert('Select noise levels');return;}noiseLevels.sort((a,b)=>a-b);document.getElementById('rob-progress').classList.remove('hidden');document.getElementById('rob-progress-bar').style.width='5%';const img=await loadImageFromFile(imgFile),keyText=await readFileAsText(keyFile),keyBits=parseBitstream(keyText,keyText.length),origData=getImageData(img,512);document.getElementById('rob-progress-bar').style.width='15%';const encData=xorProcess(origData,keyBits,0);const results=[];for(let s=0;s<noiseLevels.length;s++){const pct=noiseLevels[s];document.getElementById('rob-status').textContent=`Noise ${pct}% (${s+1}/${noiseLevels.length})`;document.getElementById('rob-progress-bar').style.width=(15+(s/noiseLevels.length)*70)+'%';await new Promise(r=>setTimeout(r,50));const noisyEnc=addSaltPepperNoise(encData,pct),decData=xorProcess(noisyEnc,keyBits,0);const od=origData.data,dd=decData.data;let m=0;for(let i=0;i<od.length;i+=4)for(let c=0;c<3;c++){const d=od[i+c]-dd[i+c];m+=d*d;}const mse=m/(512*512*3),psnr=10*Math.log10(65025/(mse+1e-10));results.push({pct,decData,mse,psnr});}document.getElementById('rob-results').classList.remove('hidden');const gallery=document.getElementById('rob-gallery');gallery.innerHTML='';gallery.style.gridTemplateColumns=`repeat(${Math.min(results.length,5)},1fr)`;results.forEach((r,idx)=>{const card=document.createElement('div');card.className='rob-card fade-in';card.style.animationDelay=(idx*0.08)+'s';const pc=r.psnr>30?'#16a34a':r.psnr>20?'#c49a2a':r.psnr>10?'#ea580c':'#c2425a';const info=document.createElement('div');info.className='px-5 pt-5 pb-3';info.innerHTML=`<div class="flex items-baseline justify-between mb-3"><span class="font-display font-800 text-lg text-ink">Noise ${r.pct}%</span></div><div class="flex items-baseline gap-2 mb-2"><span class="font-display font-800 text-3xl" style="color:${pc}">${r.psnr.toFixed(2)}</span><span class="font-mono text-sm text-muted">dB</span></div><span class="font-mono text-xs px-3 py-1 rounded-full bg-sand text-muted">MSE ${r.mse.toFixed(1)}</span>`;card.appendChild(info);const canvas=document.createElement('canvas');canvas.width=r.decData.width;canvas.height=r.decData.height;canvas.style.cssText='width:100%;display:block;image-rendering:pixelated;border-top:1px solid #e2ddd5;';canvas.getContext('2d').putImageData(r.decData,0,0);card.appendChild(canvas);gallery.appendChild(card);});destroyChart('rob-psnr');state.charts['rob-psnr']=new Chart(document.getElementById('rob-psnr-chart'),{type:'line',data:{labels:results.map(r=>r.pct+'%'),datasets:[{label:'PSNR (dB)',data:results.map(r=>r.psnr),borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.08)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#0d7377',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',usePointStyle:true}}},scales:{x:{title:{display:true,text:'Noise Ratio',color:'#7a7570'},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'PSNR (dB)',color:'#7a7570'},grid:{color:'#f0ece4'}}}}});document.getElementById('rob-progress-bar').style.width='100%';document.getElementById('rob-status').textContent=`Done! ${results.length} noise levels`;}
 function addSaltPepperNoise(imageData,p){const data=new Uint8ClampedArray(imageData.data),tp=imageData.width*imageData.height,nn=Math.floor(tp*p/100);for(let n=0;n<nn;n++){const idx=Math.floor(Math.random()*tp)*4;if(Math.random()<.5){data[idx]=255;data[idx+1]=255;data[idx+2]=255;}else{data[idx]=0;data[idx+1]=0;data[idx+2]=0;}}return new ImageData(data,imageData.width,imageData.height);}
