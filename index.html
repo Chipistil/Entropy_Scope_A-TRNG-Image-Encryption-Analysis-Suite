@@ -6,6 +6,7 @@
   <title>TRNG Image Encryption Analysis Suite</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
   <script>
     tailwind.config={theme:{extend:{colors:{cream:'#faf8f5',sand:'#f0ece4',ink:'#1a1a1a',muted:'#7a7570',line:'#e2ddd5',accent:{DEFAULT:'#0d7377',light:'#e6f3f3',dark:'#095456'},rose:'#c2425a',gold:'#c49a2a',sky:'#2563eb'},fontFamily:{display:['Arial','sans-serif'],body:['Arial','sans-serif'],mono:['Arial','sans-serif']}}}}
   </script>
@@ -92,7 +93,7 @@
       </button>
       <button onclick="switchTab('statistics')" id="nav-statistics" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-        <div><span class="block text-sm">Statistical Analysis</span><span class="block text-[10px] text-muted font-normal">Entropy & Histogram</span></div>
+        <div><span class="block text-sm">Statistical Analysis</span><span class="block text-[10px] text-muted font-normal">Entropy & 3D</span></div>
       </button>
       <button onclick="switchTab('quality')" id="nav-quality" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
@@ -105,13 +106,13 @@
     </div>
     <div class="p-5 border-t border-line">
       <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-green-400"></div><span class="font-mono text-xs text-muted">Browser-based</span></div>
-      <p class="font-mono text-[10px] text-line">v1.6 · Pure Client-side</p>
+      <p class="font-mono text-[10px] text-line">v1.7 · Pure Client-side</p>
     </div>
   </nav>
 
   <main class="ml-64 flex-1 min-h-screen bg-cream">
 
-    <!-- ==================== Bitstream Analysis ==================== -->
+    <!-- Bitstream Analysis -->
     <section id="sec-bitstream" class="p-10 max-w-7xl mx-auto">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
@@ -140,185 +141,78 @@
         <button onclick="runBitstreamAnalysis()" class="btn-primary mt-6 px-8 py-3 rounded-xl font-body text-sm">
           <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Start Analysis</span>
         </button>
-        <div id="bs-progress" class="hidden mt-4">
-          <div class="progress-bar"><div class="progress-bar-fill" id="bs-progress-bar" style="width:0%"></div></div>
-          <p class="font-mono text-xs text-muted mt-2" id="bs-status">Processing...</p>
-        </div>
+        <div id="bs-progress" class="hidden mt-4"><div class="progress-bar"><div class="progress-bar-fill" id="bs-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="bs-status">Processing...</p></div>
       </div>
       <div id="bs-results" class="hidden">
         <div class="grid grid-cols-4 gap-5 mb-8 fade-in">
-          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Shannon Entropy</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-accent" id="bs-entropy">—</p><p class="font-mono text-xs text-muted mt-1">bits / symbol</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">P(1)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(99,102,241,.08)"><svg class="w-4 h-4" style="color:#6366f1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg></div></div>
-            <p class="font-display font-800 text-3xl" style="color:#6366f1" id="bs-p1">—</p><p class="font-mono text-xs text-muted mt-1">bit=1 probability</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 1s</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-rose" id="bs-count1">—</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 0s</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(196,154,42,.08)"><svg class="w-4 h-4 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="2"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-gold" id="bs-count0">—</p>
-          </div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Shannon Entropy</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div><p class="font-display font-800 text-3xl text-accent" id="bs-entropy">—</p><p class="font-mono text-xs text-muted mt-1">bits / symbol</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">P(1)</p></div><p class="font-display font-800 text-3xl" style="color:#6366f1" id="bs-p1">—</p><p class="font-mono text-xs text-muted mt-1">bit=1 probability</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 1s</p></div><p class="font-display font-800 text-3xl text-rose" id="bs-count1">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Count of 0s</p></div><p class="font-display font-800 text-3xl text-gold" id="bs-count0">—</p></div>
         </div>
         <div class="grid grid-cols-2 gap-6 mb-8">
-          <div class="card p-6 fade-in">
-            <h3 class="font-display font-700 text-base text-ink mb-1">Bitmap Visualization</h3>
-            <p class="font-body text-xs text-muted mb-4">Spatial distribution of bitstream; ideal random source should show uniform noise</p>
-            <div class="bg-sand rounded-xl p-4"><canvas id="bs-bitmap" class="w-full rounded-lg" style="background:#fff"></canvas></div>
-            <p class="font-mono text-xs text-muted mt-3 text-center" id="bs-bitmap-info"></p>
-          </div>
-          <div class="card p-6 fade-in">
-            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Calculation</h3>
-            <p class="font-body text-xs text-muted mb-4">Step-by-step derivation of Shannon entropy H = -Σp(i)·log₂(p(i))</p>
-            <div id="bs-calc-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-80 leading-relaxed"></div>
-          </div>
+          <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-1">Bitmap Visualization</h3><p class="font-body text-xs text-muted mb-4">Spatial distribution of bitstream</p><div class="bg-sand rounded-xl p-4"><canvas id="bs-bitmap" class="w-full rounded-lg" style="background:#fff"></canvas></div><p class="font-mono text-xs text-muted mt-3 text-center" id="bs-bitmap-info"></p></div>
+          <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-1">Entropy Calculation</h3><p class="font-body text-xs text-muted mb-4">Step-by-step derivation</p><div id="bs-calc-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-80 leading-relaxed"></div></div>
         </div>
-        <div class="card p-6 fade-in">
-          <h3 class="font-display font-700 text-base text-ink mb-1">Autocorrelation Function (ACF)</h3>
-          <p class="font-body text-xs text-muted mb-4">Measures autocorrelation at different lags (lag ≥ 1); ideal values should fall within the 95% confidence interval</p>
-          <canvas id="bs-acf-chart" height="120"></canvas>
-        </div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-1">Autocorrelation Function (ACF)</h3><p class="font-body text-xs text-muted mb-4">Measures autocorrelation at different lags</p><canvas id="bs-acf-chart" height="120"></canvas></div>
       </div>
     </section>
 
-    <!-- ==================== Image Encryption ==================== -->
+    <!-- Image Encryption -->
     <section id="sec-encryption" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">02</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Image XOR Encryption / Decryption</h2>
-        </div>
-        <p class="font-body text-sm text-muted">Use TRNG bitstream as key for pixel-wise XOR encryption and decryption of color images</p>
-      </div>
+      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">02</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Image XOR Encryption / Decryption</h2></div><p class="font-body text-sm text-muted">Use TRNG bitstream as key for pixel-wise XOR encryption and decryption</p></div>
       <div class="grid grid-cols-2 gap-6 mb-8">
-        <div class="card p-7 fade-in">
-          <h3 class="font-display font-700 text-base text-ink mb-1">Original Image</h3>
-          <p class="font-body text-xs text-muted mb-4">Select the color image to encrypt</p>
-          <div id="enc-img-dropzone" class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-img').click()">
-            <div class="w-12 h-12 rounded-xl bg-sand flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            </div>
-            <p class="text-sm text-ink font-medium">Drag & drop or click to upload image</p>
-            <p class="text-xs text-line mt-1" id="enc-img-name">Supports PNG / JPG</p>
-          </div>
-          <input type="file" id="enc-img" class="hidden" accept="image/*" onchange="handleEncImg(this)">
-          <div id="enc-preview-area" class="enc-preview-wrap mt-4 hidden"><canvas id="enc-orig-preview"></canvas></div>
-        </div>
-        <div class="card p-7 fade-in" style="animation-delay:.08s">
-          <h3 class="font-display font-700 text-base text-ink mb-1">Key Bitstream</h3>
-          <p class="font-body text-xs text-muted mb-4">Upload the TRNG-generated key file</p>
-          <div class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-key').click()">
-            <div class="w-12 h-12 rounded-xl bg-sand flex items-center justify-center mx-auto mb-3">
-              <svg class="w-6 h-6 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-            </div>
-            <p class="text-sm text-ink font-medium">Drag & drop or click to upload key file</p>
-            <p class="text-xs text-line mt-1" id="enc-key-name">.txt format</p>
-          </div>
-          <input type="file" id="enc-key" class="hidden" accept=".txt" onchange="handleEncKey(this)">
-          <div class="mt-4"><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Start Bit Position</label><input type="number" id="enc-start" value="0" min="0" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
-        </div>
+        <div class="card p-7 fade-in"><h3 class="font-display font-700 text-base text-ink mb-1">Original Image</h3><p class="font-body text-xs text-muted mb-4">Select the color image to encrypt</p><div class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-img').click()"><p class="text-sm text-ink font-medium" id="enc-img-name">Drag & drop or click</p></div><input type="file" id="enc-img" class="hidden" accept="image/*" onchange="handleEncImg(this)"><div id="enc-preview-area" class="enc-preview-wrap mt-4 hidden"><canvas id="enc-orig-preview"></canvas></div></div>
+        <div class="card p-7 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-1">Key Bitstream</h3><p class="font-body text-xs text-muted mb-4">Upload TRNG key file</p><div class="drop-zone rounded-xl p-8 text-center cursor-pointer" onclick="document.getElementById('enc-key').click()"><p class="text-sm text-ink font-medium" id="enc-key-name">.txt format</p></div><input type="file" id="enc-key" class="hidden" accept=".txt" onchange="handleEncKey(this)"><div class="mt-4"><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Start Bit Position</label><input type="number" id="enc-start" value="0" min="0" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div></div>
       </div>
-      <button onclick="runEncryption()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Encrypt & Decrypt</span>
-      </button>
+      <button onclick="runEncryption()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5"><span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Encrypt & Decrypt</span></button>
       <div id="enc-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="enc-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="enc-status">Processing...</p></div>
       <div id="enc-results" class="hidden">
         <div class="fancy-divider"><span>Results</span></div>
         <div class="grid grid-cols-3 gap-6 mb-8 fade-in">
-          <div class="card p-6 text-center"><div class="glow-badge mb-3 justify-center"><span class="font-mono">Original</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Original Image</h3><canvas id="enc-orig-canvas" class="img-preview mx-auto"></canvas></div>
-          <div class="card p-6 text-center" style="border-color:rgba(194,66,90,.3)"><div class="glow-badge mb-3 justify-center" style="background:rgba(194,66,90,.08);color:#c2425a;border-color:rgba(194,66,90,.15)"><span class="font-mono">Encrypted</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Encrypted Image</h3><canvas id="enc-enc-canvas" class="img-preview mx-auto"></canvas></div>
-          <div class="card p-6 text-center" style="border-color:rgba(22,163,74,.3)"><div class="glow-badge mb-3 justify-center" style="background:rgba(22,163,74,.08);color:#16a34a;border-color:rgba(22,163,74,.15)"><span class="font-mono">Decrypted</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Decrypted Image</h3><canvas id="enc-dec-canvas" class="img-preview mx-auto"></canvas></div>
+          <div class="card p-6 text-center"><div class="glow-badge mb-3 justify-center"><span class="font-mono">Original</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Original</h3><canvas id="enc-orig-canvas" class="img-preview mx-auto"></canvas></div>
+          <div class="card p-6 text-center" style="border-color:rgba(194,66,90,.3)"><div class="glow-badge mb-3 justify-center" style="background:rgba(194,66,90,.08);color:#c2425a;border-color:rgba(194,66,90,.15)"><span class="font-mono">Encrypted</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Encrypted</h3><canvas id="enc-enc-canvas" class="img-preview mx-auto"></canvas></div>
+          <div class="card p-6 text-center" style="border-color:rgba(22,163,74,.3)"><div class="glow-badge mb-3 justify-center" style="background:rgba(22,163,74,.08);color:#16a34a;border-color:rgba(22,163,74,.15)"><span class="font-mono">Decrypted</span></div><h3 class="font-display font-700 text-base text-ink mb-4">Decrypted</h3><canvas id="enc-dec-canvas" class="img-preview mx-auto"></canvas></div>
         </div>
         <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Key Usage Statistics</h3><div id="enc-stats" class="font-mono text-sm text-muted leading-loose"></div></div>
       </div>
     </section>
 
-    <!-- ==================== Statistical Analysis ==================== -->
+    <!-- Statistical Analysis -->
     <section id="sec-statistics" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">03</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Statistical Analysis</h2>
-        </div>
-        <p class="font-body text-sm text-muted">Compare information entropy, histogram distributions, and adjacent pixel correlations between original and encrypted images</p>
-      </div>
+      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">03</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Statistical Analysis</h2></div><p class="font-body text-sm text-muted">Compare entropy, histograms, 3D pixel distributions, and pixel correlations</p></div>
       <div class="grid grid-cols-2 gap-6 mb-6">
         <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-orig').click()"><p class="text-sm text-ink font-medium" id="stat-orig-name">Click to upload original image</p></div><input type="file" id="stat-orig" class="hidden" accept="image/*"></div>
         <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-enc').click()"><p class="text-sm text-ink font-medium" id="stat-enc-name">Click to upload encrypted image</p></div><input type="file" id="stat-enc" class="hidden" accept="image/*"></div>
       </div>
-      <div class="card p-5 mb-6 fade-in flex items-center gap-4">
-        <label class="font-mono text-xs text-muted uppercase tracking-wider whitespace-nowrap">Correlation Sample Pairs</label>
-        <input type="number" id="stat-pairs" value="3000" min="100" class="rounded-xl px-4 py-2.5 font-mono text-sm w-40">
-      </div>
-      <button onclick="runStatAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Run Statistical Analysis</span>
-      </button>
+      <div class="card p-5 mb-6 fade-in flex items-center gap-4"><label class="font-mono text-xs text-muted uppercase tracking-wider whitespace-nowrap">Correlation Sample Pairs</label><input type="number" id="stat-pairs" value="3000" min="100" class="rounded-xl px-4 py-2.5 font-mono text-sm w-40"></div>
+      <button onclick="runStatAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5"><span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Run Statistical Analysis</span></button>
       <div id="stat-results" class="hidden">
 
-        <!-- ========== Information Entropy Analysis ========== -->
+        <!-- Information Entropy -->
         <div class="fancy-divider"><span>Information Entropy</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-2 fade-in section-header">Information Entropy Analysis</h3>
-        <p class="font-body text-sm text-muted mb-6 fade-in">Shannon entropy H = -Σp(i)·log₂(p(i)) for each R/G/B channel, comparing original and encrypted images (theoretical maximum: 8 bits/pixel for 8-bit images)</p>
-
+        <p class="font-body text-sm text-muted mb-6 fade-in">Shannon entropy H = -Σp(i)·log₂(p(i)) for each R/G/B channel (theoretical max: 8 bits/pixel)</p>
         <p class="font-mono text-[10px] text-muted uppercase tracking-widest mb-3 fade-in">Original Image Entropy</p>
         <div class="grid grid-cols-4 gap-4 mb-5 fade-in">
-          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Red (H_R)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-rose" id="ent-orig-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Green (H_G)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(22,163,74,.08)"><svg class="w-4 h-4" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-orig-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Blue (H_B)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(37,99,235,.08)"><svg class="w-4 h-4 text-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-sky" id="ent-orig-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Total (H)</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-accent" id="ent-orig-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Red (H_R)</p></div><p class="font-display font-800 text-3xl text-rose" id="ent-orig-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Green (H_G)</p></div><p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-orig-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Blue (H_B)</p></div><p class="font-display font-800 text-3xl text-sky" id="ent-orig-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Total (H)</p></div><p class="font-display font-800 text-3xl text-accent" id="ent-orig-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
         </div>
-
         <p class="font-mono text-[10px] text-muted uppercase tracking-widest mb-3 fade-in" style="animation-delay:.04s">Encrypted Image Entropy</p>
         <div class="grid grid-cols-4 gap-4 mb-5 fade-in" style="animation-delay:.04s">
-          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Red (H_R)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-rose" id="ent-enc-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Green (H_G)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(22,163,74,.08)"><svg class="w-4 h-4" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-enc-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Blue (H_B)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(37,99,235,.08)"><svg class="w-4 h-4 text-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-sky" id="ent-enc-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
-          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
-            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Total (H)</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
-            <p class="font-display font-800 text-3xl text-accent" id="ent-enc-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
-          </div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Red (H_R)</p><p class="font-display font-800 text-3xl text-rose" id="ent-enc-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Green (H_G)</p><p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-enc-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Blue (H_B)</p><p class="font-display font-800 text-3xl text-sky" id="ent-enc-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-3">Total (H)</p><p class="font-display font-800 text-3xl text-accent" id="ent-enc-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p></div>
         </div>
-
         <div class="grid grid-cols-2 gap-6 mb-8">
-          <div class="card p-6 fade-in" style="animation-delay:.08s">
-            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Change Summary</h3>
-            <p class="font-body text-xs text-muted mb-4">Per-channel entropy difference (Encrypted - Original) and ratio to theoretical maximum</p>
-            <div id="ent-diff-table" class="overflow-x-auto mb-4"></div>
-            <div id="ent-analysis-text" class="font-mono text-xs text-muted leading-relaxed bg-sand rounded-xl p-4"></div>
-          </div>
-          <div class="card p-6 fade-in" style="animation-delay:.12s">
-            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Comparison</h3>
-            <p class="font-body text-xs text-muted mb-4">Grouped bar chart: Original vs Encrypted per-channel entropy</p>
-            <canvas id="entropy-compare-chart" height="140"></canvas>
-          </div>
+          <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-1">Entropy Change Summary</h3><p class="font-body text-xs text-muted mb-4">Per-channel difference and ratio to theoretical max</p><div id="ent-diff-table" class="overflow-x-auto mb-4"></div><div id="ent-analysis-text" class="font-mono text-xs text-muted leading-relaxed bg-sand rounded-xl p-4"></div></div>
+          <div class="card p-6 fade-in" style="animation-delay:.12s"><h3 class="font-display font-700 text-base text-ink mb-1">Entropy Comparison</h3><p class="font-body text-xs text-muted mb-4">Grouped bar chart</p><canvas id="entropy-compare-chart" height="140"></canvas></div>
         </div>
-        <!-- ========== End Information Entropy Analysis ========== -->
 
+        <!-- Histograms -->
         <div class="fancy-divider"><span>Original · Histogram</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Original Image Color Histogram</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
@@ -333,6 +227,26 @@
           <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#16a34a"></div><h4 class="font-display font-600 text-sm text-ink">Green Channel</h4></div><canvas id="hist-enc-g" height="160"></canvas></div>
           <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-3"><div class="w-2 h-2 rounded-full" style="background:#2563eb"></div><h4 class="font-display font-600 text-sm text-ink">Blue Channel</h4></div><canvas id="hist-enc-b" height="160"></canvas></div>
         </div>
+
+        <!-- 3D Pixel Distribution -->
+        <div class="fancy-divider"><span>Original · 3D Distribution</span></div>
+        <h3 class="font-display font-700 text-lg text-ink mb-2 fade-in section-header">Original Image 3D Pixel Distribution</h3>
+        <p class="font-body text-xs text-muted mb-5 fade-in">3D surface of channel values across pixel coordinates. Drag to rotate, scroll to zoom.</p>
+        <div class="grid grid-cols-3 gap-5 mb-8">
+          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#c2425a"></div><h4 class="font-display font-600 text-sm text-ink">Red Channel</h4></div><div id="plot3d-orig-r" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#16a34a"></div><h4 class="font-display font-600 text-sm text-ink">Green Channel</h4></div><div id="plot3d-orig-g" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#2563eb"></div><h4 class="font-display font-600 text-sm text-ink">Blue Channel</h4></div><div id="plot3d-orig-b" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+        </div>
+        <div class="fancy-divider"><span>Encrypted · 3D Distribution</span></div>
+        <h3 class="font-display font-700 text-lg text-ink mb-2 fade-in section-header">Encrypted Image 3D Pixel Distribution</h3>
+        <p class="font-body text-xs text-muted mb-5 fade-in">Encrypted images should exhibit a more uniform, noise-like surface pattern.</p>
+        <div class="grid grid-cols-3 gap-5 mb-8">
+          <div class="card p-5 fade-in"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#c2425a"></div><h4 class="font-display font-600 text-sm text-ink">Red Channel</h4></div><div id="plot3d-enc-r" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+          <div class="card p-5 fade-in" style="animation-delay:.05s"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#16a34a"></div><h4 class="font-display font-600 text-sm text-ink">Green Channel</h4></div><div id="plot3d-enc-g" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+          <div class="card p-5 fade-in" style="animation-delay:.1s"><div class="flex items-center gap-2 mb-1"><div class="w-2 h-2 rounded-full" style="background:#2563eb"></div><h4 class="font-display font-600 text-sm text-ink">Blue Channel</h4></div><div id="plot3d-enc-b" style="height:340px;border-radius:10px;overflow:hidden"></div></div>
+        </div>
+
+        <!-- Correlations -->
         <div class="fancy-divider"><span>Original · Correlation</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Original Image Adjacent Pixel Correlation</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
@@ -351,117 +265,44 @@
       </div>
     </section>
 
-    <!-- ==================== Fidelity Analysis ==================== -->
+    <!-- Fidelity Analysis -->
     <section id="sec-quality" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">04</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Fidelity Analysis</h2>
-        </div>
-        <p class="font-body text-sm text-muted">Compute MSE, PSNR, and SSIM between original and encrypted images</p>
-      </div>
+      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">04</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Fidelity Analysis</h2></div><p class="font-body text-sm text-muted">Compute MSE, PSNR, and SSIM between original and encrypted images</p></div>
       <div class="grid grid-cols-2 gap-6 mb-6">
-        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">Click to upload original image</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">Click to upload encrypted image</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-orig').click()"><p class="text-sm text-ink font-medium" id="q-orig-name">Click to upload</p></div><input type="file" id="q-orig" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in" style="animation-delay:.08s"><h3 class="font-display font-700 text-base text-ink mb-2">Encrypted Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('q-enc').click()"><p class="text-sm text-ink font-medium" id="q-enc-name">Click to upload</p></div><input type="file" id="q-enc" class="hidden" accept="image/*"></div>
       </div>
-      <div class="card p-6 mb-6 fade-in">
-        <h3 class="font-display font-700 text-sm text-ink mb-4">SSIM Parameter Configuration</h3>
-        <div class="grid grid-cols-3 gap-5">
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">Window Size</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8x8</option><option value="11" selected>11x11</option><option value="16">16x16</option></select></div>
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K1</label><input type="number" id="ssim-k1" value="0.01" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
-          <div><label class="font-mono text-xs text-muted block mb-2 uppercase tracking-wider">K2</label><input type="number" id="ssim-k2" value="0.03" step="0.001" min="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div>
-        </div>
-      </div>
-      <button onclick="runQualityAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Compute MSE & PSNR & SSIM</span>
-      </button>
+      <div class="card p-6 mb-6 fade-in"><h3 class="font-display font-700 text-sm text-ink mb-4">SSIM Parameters</h3><div class="grid grid-cols-3 gap-5"><div><label class="font-mono text-xs text-muted block mb-2 uppercase">Window</label><select id="ssim-window" class="w-full rounded-xl px-4 py-3 font-mono text-sm"><option value="8">8x8</option><option value="11" selected>11x11</option><option value="16">16x16</option></select></div><div><label class="font-mono text-xs text-muted block mb-2 uppercase">K1</label><input type="number" id="ssim-k1" value="0.01" step="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div><div><label class="font-mono text-xs text-muted block mb-2 uppercase">K2</label><input type="number" id="ssim-k2" value="0.03" step="0.001" class="w-full rounded-xl px-4 py-3 font-mono text-sm"></div></div></div>
+      <button onclick="runQualityAnalysis()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5"><span class="flex items-center gap-2">Compute MSE & PSNR & SSIM</span></button>
       <div id="q-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="q-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="q-status">Processing...</p></div>
       <div id="q-results" class="hidden">
         <div class="grid grid-cols-5 gap-4 mb-8 fade-in">
-          <div class="stat-card card p-5" style="--accent-line:#c49a2a;--accent-glow:rgba(196,154,42,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p><p class="font-mono text-xs text-muted mt-1">dB</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Overall SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#6366f1;--accent-glow:rgba(99,102,241,.08)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Diff Range</p><p class="font-display font-700 text-lg mt-1" style="color:#6366f1" id="diff-range">—</p></div>
-          <div class="stat-card card p-5" style="--accent-line:#7a7570;--accent-glow:rgba(122,117,112,.06)"><p class="font-mono text-xs text-muted uppercase tracking-wider mb-2">Image Size</p><p class="font-display font-700 text-lg text-ink mt-1" id="img-size-info">512x512</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c49a2a"><p class="font-mono text-xs text-muted uppercase mb-2">MSE</p><p class="font-display font-800 text-2xl text-gold" id="mse-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377"><p class="font-mono text-xs text-muted uppercase mb-2">PSNR</p><p class="font-display font-800 text-2xl text-accent" id="psnr-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#c2425a"><p class="font-mono text-xs text-muted uppercase mb-2">SSIM</p><p class="font-display font-800 text-2xl text-rose" id="ssim-all-card">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#6366f1"><p class="font-mono text-xs text-muted uppercase mb-2">Diff Range</p><p class="font-display font-700 text-lg" style="color:#6366f1" id="diff-range">—</p></div>
+          <div class="stat-card card p-5" style="--accent-line:#7a7570"><p class="font-mono text-xs text-muted uppercase mb-2">Size</p><p class="font-display font-700 text-lg text-ink" id="img-size-info">512x512</p></div>
         </div>
-        <div class="fancy-divider"><span>Channel Breakdown</span></div>
-        <div class="grid grid-cols-3 gap-5 mb-8 fade-in" style="animation-delay:.05s">
-          <div class="card p-6">
-            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full" style="background:#c2425a"></span> MSE</h3>
-            <div class="space-y-4">
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="mse-r">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="mse-g">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="mse-b">—</span></div>
-              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-gold" id="mse-all">—</span></div>
-            </div>
-          </div>
-          <div class="card p-6">
-            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-accent"></span> PSNR</h3>
-            <div class="space-y-4">
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="psnr-r">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="psnr-g">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="psnr-b">—</span></div>
-              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-accent" id="psnr-all">—</span></div>
-            </div>
-          </div>
-          <div class="card p-6">
-            <h3 class="font-display font-700 text-base text-ink mb-5 flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-rose"></span> SSIM</h3>
-            <div class="space-y-4">
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-rose font-medium">R</span><span class="font-mono text-sm text-ink" id="ssim-r">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm font-medium" style="color:#16a34a">G</span><span class="font-mono text-sm text-ink" id="ssim-g">—</span></div>
-              <div class="flex justify-between items-center p-3 rounded-lg bg-sand"><span class="font-mono text-sm text-sky font-medium">B</span><span class="font-mono text-sm text-ink" id="ssim-b">—</span></div>
-              <div class="border-t-2 border-line pt-3 flex justify-between items-center"><span class="font-mono text-sm text-muted font-medium">Overall</span><span class="font-display font-800 text-xl text-rose" id="ssim-all">—</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="card p-6 mb-8 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-4">Channel Detail Statistics</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
-        <div class="card p-6 fade-in" style="animation-delay:.15s"><h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
+        <div class="card p-6 mb-8 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Channel Details</h3><div id="q-channel-table" class="overflow-x-auto"></div></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation</h3><div id="q-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div></div>
       </div>
     </section>
 
-    <!-- ==================== Robustness Test ==================== -->
+    <!-- Robustness Test -->
     <section id="sec-robustness" class="p-10 max-w-7xl mx-auto hidden">
-      <div class="mb-8 fade-in">
-        <div class="flex items-center gap-3 mb-1">
-          <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">05</span></span>
-          <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Robustness Test</h2>
-        </div>
-        <p class="font-body text-sm text-muted">Add salt-and-pepper noise at different ratios to the encrypted image, then decrypt to evaluate noise resistance</p>
-      </div>
+      <div class="mb-8 fade-in"><div class="flex items-center gap-3 mb-1"><span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">05</span></span><h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Robustness Test</h2></div><p class="font-body text-sm text-muted">Add salt-and-pepper noise to encrypted image, decrypt, and evaluate noise resistance</p></div>
       <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.6fr">
-        <div class="card p-6 fade-in flex flex-col">
-          <h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3>
-          <p class="font-body text-xs text-muted mb-3">Select the image to test</p>
-          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-img').click()"><p class="text-sm text-ink font-medium" id="rob-img-name">Click to upload</p></div>
-          <input type="file" id="rob-img" class="hidden" accept="image/*">
-        </div>
-        <div class="card p-6 fade-in flex flex-col" style="animation-delay:.06s">
-          <h3 class="font-display font-700 text-base text-ink mb-2">Key Bitstream</h3>
-          <p class="font-body text-xs text-muted mb-3">Upload the corresponding key file</p>
-          <div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-key').click()"><p class="text-sm text-ink font-medium" id="rob-key-name">Click to upload .txt</p></div>
-          <input type="file" id="rob-key" class="hidden" accept=".txt">
-        </div>
-        <div class="card p-6 fade-in" style="animation-delay:.12s">
-          <h3 class="font-display font-700 text-base text-ink mb-2">Noise Ratio</h3>
-          <p class="font-body text-xs text-muted mb-4">Select noise levels to test</p>
-          <div class="flex items-center gap-3 flex-wrap">
-            <label class="noise-check"><input type="checkbox" class="rob-noise" value="0" checked><span>0%</span></label>
-            <label class="noise-check"><input type="checkbox" class="rob-noise" value="6.25" checked><span>6.25%</span></label>
-            <label class="noise-check"><input type="checkbox" class="rob-noise" value="12.5" checked><span>12.5%</span></label>
-            <label class="noise-check"><input type="checkbox" class="rob-noise" value="25" checked><span>25%</span></label>
-            <label class="noise-check"><input type="checkbox" class="rob-noise" value="50" checked><span>50%</span></label>
-          </div>
-        </div>
+        <div class="card p-6 fade-in flex flex-col"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><p class="font-body text-xs text-muted mb-3">Select image</p><div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-img').click()"><p class="text-sm text-ink font-medium" id="rob-img-name">Upload</p></div><input type="file" id="rob-img" class="hidden" accept="image/*"></div>
+        <div class="card p-6 fade-in flex flex-col" style="animation-delay:.06s"><h3 class="font-display font-700 text-base text-ink mb-2">Key Bitstream</h3><p class="font-body text-xs text-muted mb-3">Key file</p><div class="drop-zone rounded-xl p-5 text-center cursor-pointer mt-auto" onclick="document.getElementById('rob-key').click()"><p class="text-sm text-ink font-medium" id="rob-key-name">Upload .txt</p></div><input type="file" id="rob-key" class="hidden" accept=".txt"></div>
+        <div class="card p-6 fade-in" style="animation-delay:.12s"><h3 class="font-display font-700 text-base text-ink mb-2">Noise Ratio</h3><p class="font-body text-xs text-muted mb-4">Select levels</p><div class="flex items-center gap-3 flex-wrap"><label class="noise-check"><input type="checkbox" class="rob-noise" value="0" checked><span>0%</span></label><label class="noise-check"><input type="checkbox" class="rob-noise" value="6.25" checked><span>6.25%</span></label><label class="noise-check"><input type="checkbox" class="rob-noise" value="12.5" checked><span>12.5%</span></label><label class="noise-check"><input type="checkbox" class="rob-noise" value="25" checked><span>25%</span></label><label class="noise-check"><input type="checkbox" class="rob-noise" value="50" checked><span>50%</span></label></div></div>
       </div>
-      <button onclick="runRobustnessTest()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5">
-        <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>Run Robustness Test</span>
-      </button>
+      <button onclick="runRobustnessTest()" class="btn-primary px-8 py-3 rounded-xl font-body text-sm mb-5"><span class="flex items-center gap-2">Run Robustness Test</span></button>
       <div id="rob-progress" class="hidden mb-5"><div class="progress-bar"><div class="progress-bar-fill" id="rob-progress-bar" style="width:0%"></div></div><p class="font-mono text-xs text-muted mt-2" id="rob-status">Processing...</p></div>
       <div id="rob-results" class="hidden">
         <div class="fancy-divider"><span>Decryption Results</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Decryption Results by Noise Ratio</h3>
         <div id="rob-gallery" class="grid gap-5 mb-10 fade-in"></div>
-        <div class="card p-6 fade-in" style="animation-delay:.1s"><h3 class="font-display font-700 text-base text-ink mb-1">PSNR vs Noise Ratio</h3><p class="font-body text-xs text-muted mb-4">Higher noise leads to lower decrypted image quality</p><canvas id="rob-psnr-chart" height="100"></canvas></div>
+        <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-1">PSNR vs Noise Ratio</h3><canvas id="rob-psnr-chart" height="100"></canvas></div>
       </div>
     </section>
   </main>
@@ -481,109 +322,33 @@ function computeSSIM(id1,id2,ws,K1,K2){const w=id1.width,h=id1.height,d1=id1.dat
 Chart.defaults.color='#7a7570';Chart.defaults.borderColor='#e2ddd5';Chart.defaults.font.family='Arial';
 const fivePointStarPlugin={id:'fivePointStar',afterDatasetsDraw(chart){chart.data.datasets.forEach((dataset,di)=>{if(dataset._drawStar!==true)return;const meta=chart.getDatasetMeta(di);const ctx=chart.ctx;meta.data.forEach((pt)=>{const{x,y}=pt.getCenterPoint();const r=dataset._starSize||7;ctx.save();ctx.fillStyle=dataset.pointBackgroundColor||'#c2425a';ctx.strokeStyle=dataset.pointBorderColor||'#c2425a';ctx.lineWidth=1;ctx.beginPath();for(let k=0;k<5;k++){const oa=(k*2*Math.PI/5)-Math.PI/2;const ia=((k+0.5)*2*Math.PI/5)-Math.PI/2;const ox=x+r*Math.cos(oa);const oy=y+r*Math.sin(oa);const ix=x+(r*0.382)*Math.cos(ia);const iy=y+(r*0.382)*Math.sin(ia);if(k===0)ctx.moveTo(ox,oy);else ctx.lineTo(ox,oy);ctx.lineTo(ix,iy);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();});});}};
 Chart.register(fivePointStarPlugin);
+function calculateImageEntropy(imageData){const d=imageData.data,w=imageData.width,h=imageData.height,totalPixels=w*h;const hist={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};for(let i=0;i<d.length;i+=4){hist.r[d[i]]++;hist.g[d[i+1]]++;hist.b[d[i+2]]++;}function channelEntropy(h){const p=h.map(c=>c/totalPixels);let e=0;for(let i=0;i<256;i++){if(p[i]>0)e+=-p[i]*Math.log2(p[i]);}return{entropy:e};}const r=channelEntropy(hist.r),g=channelEntropy(hist.g),b=channelEntropy(hist.b);return{r,g,b,totalEntropy:(r.entropy+g.entropy+b.entropy)/3,totalPixels,width:w,height:h};}
+function renderEntropyChangeTable(oE,eE){const rows=[{name:'Red (R)',orig:oE.r.entropy,enc:eE.r.entropy,color:'#c2425a'},{name:'Green (G)',orig:oE.g.entropy,enc:eE.g.entropy,color:'#16a34a'},{name:'Blue (B)',orig:oE.b.entropy,enc:eE.b.entropy,color:'#2563eb'},{name:'Total (H)',orig:oE.totalEntropy,enc:eE.totalEntropy,color:'#0d7377'}];let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Channel</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Original</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Encrypted</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Change</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Ratio to Max</th></tr></thead><tbody>';rows.forEach((r,idx)=>{const diff=r.enc-r.orig,bg=idx%2===0?'#fff':'#faf8f5',dc=diff>0?'#16a34a':diff<0?'#c2425a':'#7a7570',ar=diff>0?'↑':diff<0?'↓':'→';t+=`<tr style="background:${bg}"><td class="py-3 px-4 font-medium" style="color:${r.color}">${r.name}</td><td class="py-3 px-4 text-center${idx===3?' font-bold':''}">${r.orig.toFixed(6)}</td><td class="py-3 px-4 text-center${idx===3?' font-bold':''}">${r.enc.toFixed(6)}</td><td class="py-3 px-4 text-center font-bold" style="color:${dc}">${diff>=0?'+':''}${diff.toFixed(6)} ${ar}</td><td class="py-3 px-4 text-center">${(r.orig/8*100).toFixed(2)}% → <span class="font-bold">${(r.enc/8*100).toFixed(2)}%</span></td></tr>`;});return t+'</tbody></table>';}
 
-/* ==================== Information Entropy Calculation ==================== */
-function calculateImageEntropy(imageData){
-  const d=imageData.data,w=imageData.width,h=imageData.height,totalPixels=w*h;
-  const hist={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};
-  for(let i=0;i<d.length;i+=4){hist.r[d[i]]++;hist.g[d[i+1]]++;hist.b[d[i+2]]++;}
-  function channelEntropy(histogram){
-    const probabilities=histogram.map(c=>c/totalPixels);
-    let entropy=0;
-    for(let i=0;i<256;i++){if(probabilities[i]>0){entropy+=-probabilities[i]*Math.log2(probabilities[i]);}}
-    return{entropy};
-  }
-  const r=channelEntropy(hist.r),g=channelEntropy(hist.g),b=channelEntropy(hist.b);
-  const totalEntropy=(r.entropy+g.entropy+b.entropy)/3;
-  return{r,g,b,totalEntropy,totalPixels,width:w,height:h};
+function render3DSurface(imageData, channelIdx, containerId, colorscale) {
+  const w=imageData.width,h=imageData.height,d=imageData.data,SAMPLE=64;
+  const sx=Math.max(1,Math.floor(w/SAMPLE)),sy=Math.max(1,Math.floor(h/SAMPLE));
+  const nw=Math.floor(w/sx),nh=Math.floor(h/sy);const z=[];
+  for(let yi=0;yi<nh;yi++){const row=[];for(let xi=0;xi<nw;xi++){const idx=(yi*sy*w+xi*sx)*4;row.push(d[idx+channelIdx]);}z.push(row);}
+  const xArr=Array.from({length:nw},(_,i)=>i*sx),yArr=Array.from({length:nh},(_,i)=>i*sy);
+  Plotly.purge(containerId);
+  Plotly.newPlot(containerId,[{type:'surface',x:xArr,y:yArr,z:z,colorscale:colorscale,opacity:0.92,colorbar:{tickfont:{family:'Arial',size:9,color:'#7a7570'},len:0.5,thickness:12,outlinewidth:0},lighting:{ambient:0.7,diffuse:0.5,specular:0.15,roughness:0.6}}],{scene:{xaxis:{title:{text:'X (Column)',font:{family:'Arial',size:10,color:'#7a7570'}},gridcolor:'#e8e4dc',backgroundcolor:'#faf8f5',tickfont:{family:'Arial',size:8,color:'#94a3b8'}},yaxis:{title:{text:'Y (Row)',font:{family:'Arial',size:10,color:'#7a7570'}},gridcolor:'#e8e4dc',backgroundcolor:'#faf8f5',tickfont:{family:'Arial',size:8,color:'#94a3b8'}},zaxis:{title:{text:'Value (0-255)',font:{family:'Arial',size:10,color:'#7a7570'}},gridcolor:'#e8e4dc',backgroundcolor:'#faf8f5',tickfont:{family:'Arial',size:8,color:'#94a3b8'},range:[0,255]},camera:{eye:{x:1.8,y:1.8,z:1.2}},bgcolor:'#faf8f5',aspectmode:'manual',aspectratio:{x:1,y:1,z:0.6}},paper_bgcolor:'rgba(0,0,0,0)',margin:{l:0,r:0,t:5,b:5},showlegend:false},{responsive:true,displayModeBar:false});
 }
-
-function renderEntropyChangeTable(origEnt,encEnt){
-  const rows=[
-    {name:'Red (R)',orig:origEnt.r.entropy,enc:encEnt.r.entropy,color:'#c2425a'},
-    {name:'Green (G)',orig:origEnt.g.entropy,enc:encEnt.g.entropy,color:'#16a34a'},
-    {name:'Blue (B)',orig:origEnt.b.entropy,enc:encEnt.b.entropy,color:'#2563eb'},
-    {name:'Total (H)',orig:origEnt.totalEntropy,enc:encEnt.totalEntropy,color:'#0d7377'}
-  ];
-  let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted">';
-  t+='<th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Channel</th>';
-  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Original</th>';
-  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Encrypted</th>';
-  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Change</th>';
-  t+='<th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Ratio to Max</th></tr></thead><tbody>';
-  rows.forEach((r,idx)=>{
-    const diff=r.enc-r.orig;
-    const pctOrig=(r.orig/8*100).toFixed(2);
-    const pctEnc=(r.enc/8*100).toFixed(2);
-    const bg=idx%2===0?'#fff':'#faf8f5';
-    const diffColor=diff>0?'#16a34a':diff<0?'#c2425a':'#7a7570';
-    const arrow=diff>0?'↑':diff<0?'↓':'→';
-    const isTotal=idx===3;
-    t+=`<tr style="background:${bg}">`;
-    t+=`<td class="py-3 px-4 font-medium" style="color:${r.color}">${r.name}</td>`;
-    t+=`<td class="py-3 px-4 text-center${isTotal?' font-bold':''}">${r.orig.toFixed(6)}</td>`;
-    t+=`<td class="py-3 px-4 text-center${isTotal?' font-bold':''}">${r.enc.toFixed(6)}</td>`;
-    t+=`<td class="py-3 px-4 text-center font-bold" style="color:${diffColor}">${diff>=0?'+':''}${diff.toFixed(6)} ${arrow}</td>`;
-    t+=`<td class="py-3 px-4 text-center">${pctOrig}% → <span class="font-bold">${pctEnc}%</span></td>`;
-    t+=`</tr>`;
-  });
-  t+='</tbody></table>';
-  return t;
-}
-/* ==================== End Information Entropy ==================== */
 
 function handleBSFile(i){state.bsFile=i.files[0];if(state.bsFile)document.getElementById('bs-filename').textContent=state.bsFile.name;}
-async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));
-for(let k=1;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}
-document.getElementById('bs-progress-bar').style.width='95%';document.getElementById('bs-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">[Principle]</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 1]</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 2]</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);
+async function runBitstreamAnalysis(){if(!state.bsFile){alert('Upload a bitstream file');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));for(let k=1;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}document.getElementById('bs-results').classList.remove('hidden');document.getElementById('bs-entropy').textContent=entropy.toFixed(6);document.getElementById('bs-p1').textContent=(p1*100).toFixed(2)+'%';document.getElementById('bs-count1').textContent=c1.toLocaleString();document.getElementById('bs-count0').textContent=c0.toLocaleString();const t1=p1>0?(-p1*Math.log2(p1)):0,t2=p0>0?(-p0*Math.log2(p0)):0;document.getElementById('bs-calc-detail').innerHTML=`<div class="text-accent mb-2 font-bold">[Principle]</div>H=-Σp(i)·log₂(p(i))<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 1]</div>p(1)=${c1}/${actualN}=${p1.toFixed(6)}<br>p(0)=${c0}/${actualN}=${p0.toFixed(6)}<br><br><div style="color:#6366f1" class="mb-2 font-bold">[Step 2]</div>H=-[${p1.toFixed(6)}·log₂(${p1.toFixed(6)})+${p0.toFixed(6)}·log₂(${p0.toFixed(6)})]<br>=-[${t1.toFixed(6)}+${t2.toFixed(6)}]<br>=<span class="text-accent font-bold">${entropy.toFixed(6)} bits</span>`;const side=Math.floor(Math.sqrt(actualN));const bmCtx=document.getElementById('bs-bitmap').getContext('2d');document.getElementById('bs-bitmap').width=side;document.getElementById('bs-bitmap').height=side;const imgD=bmCtx.createImageData(side,side);for(let i=0;i<side*side&&i<actualN;i++){const v=bits[i]===1?0:255;imgD.data[i*4]=v;imgD.data[i*4+1]=v;imgD.data[i*4+2]=v;imgD.data[i*4+3]=255;}bmCtx.putImageData(imgD,0,0);document.getElementById('bs-bitmap-info').textContent=`${side}×${side}=${side*side} bits`;const ci=1.96/Math.sqrt(actualN);destroyChart('acf');state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{type:'scatter',data:{datasets:[{label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,_drawStar:true,_starSize:8,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a'},{label:'+95% CI',data:[{x:1,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'−95% CI',data:[{x:1,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},{label:'y=0',data:[{x:1,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},scales:{x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{min:-0.02,max:0.02,title:{display:true,text:'ACF',font:{family:'Arial',size:11}},grid:{color:'#e8e4dc'},ticks:{stepSize:0.005,font:{family:'Arial',size:10},color:'#94a3b8',callback:v=>v.toFixed(3)}}}}});document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`Done! ${actualN.toLocaleString()} bits`;}
 
-destroyChart('acf');
-state.charts['acf']=new Chart(document.getElementById('bs-acf-chart'),{
-  type:'scatter',
-  data:{
-    datasets:[
-      {label:'ACF',data:lags.map((l,i)=>({x:l,y:acfV[i]})),pointRadius:0,pointBackgroundColor:'#c2425a',pointBorderColor:'#c2425a',showLine:false,_drawStar:true,_starSize:8},
-      {label:'+95% CI',data:[{x:1,y:ci},{x:maxLag,y:ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},
-      {label:'−95% CI',data:[{x:1,y:-ci},{x:maxLag,y:-ci}],type:'line',borderColor:'#94a3b8',borderDash:[5,5],pointRadius:0,borderWidth:1},
-      {label:'y = 0',data:[{x:1,y:0},{x:maxLag,y:0}],type:'line',borderColor:'rgba(194,66,90,0.35)',pointRadius:0,borderWidth:1.5}
-    ]
-  },
-  options:{
-    responsive:true,
-    plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20,filter:item=>item.text!==''}}},
-    scales:{
-      x:{title:{display:true,text:'Lag',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},
-      y:{
-        min:-0.02,
-        max:0.02,
-        title:{display:true,text:'ACF',font:{family:'Arial',size:11}},
-        grid:{color:'#e8e4dc'},
-        ticks:{
-          stepSize:0.005,
-          font:{family:'Arial',size:10},
-          color:'#94a3b8',
-          callback:function(v){return v.toFixed(3);}
-        }
-      }
-    }
-  }
-});
-
-document.getElementById('bs-progress-bar').style.width='100%';document.getElementById('bs-status').textContent=`Done! ${actualN.toLocaleString()} bits`;}
-
-function handleEncImg(i){state.encImgFile=i.files[0];if(state.encImgFile){document.getElementById('enc-img-name').textContent=state.encImgFile.name;loadImageFromFile(state.encImgFile).then(img=>{const area=document.getElementById('enc-preview-area');const c=document.getElementById('enc-orig-preview');area.classList.remove('hidden');const containerW=area.clientWidth-24;const ratio=img.naturalHeight/img.naturalWidth;const dispW=Math.min(containerW,400);const dispH=Math.round(dispW*ratio);c.width=dispW;c.height=dispH;const ctx=c.getContext('2d');ctx.drawImage(img,0,0,dispW,dispH);});}}
+function handleEncImg(i){state.encImgFile=i.files[0];if(state.encImgFile){document.getElementById('enc-img-name').textContent=state.encImgFile.name;}}
 function handleEncKey(i){state.encKeyFile=i.files[0];if(state.encKeyFile)document.getElementById('enc-key-name').textContent=state.encKeyFile.name;}
-async function runEncryption(){if(!state.encImgFile||!state.encKeyFile){alert('Please upload both image and key file');return;}document.getElementById('enc-progress').classList.remove('hidden');document.getElementById('enc-status').textContent='Loading...';document.getElementById('enc-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(state.encImgFile),keyText=await readFileAsText(state.encKeyFile),startBit=parseInt(document.getElementById('enc-start').value)||0,SIZE=512,origData=getImageData(img,SIZE),keyBits=parseBitstream(keyText,keyText.length);document.getElementById('enc-progress-bar').style.width='30%';document.getElementById('enc-status').textContent='Encrypting...';await new Promise(r=>setTimeout(r,50));const encData=xorProcess(origData,keyBits,startBit);document.getElementById('enc-progress-bar').style.width='60%';document.getElementById('enc-status').textContent='Decrypting...';await new Promise(r=>setTimeout(r,50));const decData=xorProcess(encData,keyBits,startBit);document.getElementById('enc-results').classList.remove('hidden');drawImageData(document.getElementById('enc-orig-canvas'),origData);drawImageData(document.getElementById('enc-enc-canvas'),encData);drawImageData(document.getElementById('enc-dec-canvas'),decData);const tp=SIZE*SIZE*3,rb=tp*8,au=Math.min(rb,keyBits.length-startBit);document.getElementById('enc-stats').innerHTML=`Key: <span class="text-accent">${keyBits.length.toLocaleString()}</span> bits<br>Start: <span style="color:#6366f1">${startBit}</span><br>Required: <span class="text-gold">${rb.toLocaleString()}</span><br>Used: <span class="text-accent">${au.toLocaleString()}</span><br>Remaining: <span class="text-rose">${Math.max(0,keyBits.length-startBit-au).toLocaleString()}</span>`+(keyBits.length<rb?`<br>Cycles: <span class="text-gold">${Math.ceil(rb/keyBits.length)}</span>`:'');document.getElementById('enc-progress-bar').style.width='100%';document.getElementById('enc-status').textContent='Done!';}
+async function runEncryption(){if(!state.encImgFile||!state.encKeyFile){alert('Upload both files');return;}document.getElementById('enc-progress').classList.remove('hidden');document.getElementById('enc-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(state.encImgFile),keyText=await readFileAsText(state.encKeyFile),startBit=parseInt(document.getElementById('enc-start').value)||0,SIZE=512,origData=getImageData(img,SIZE),keyBits=parseBitstream(keyText,keyText.length);document.getElementById('enc-progress-bar').style.width='30%';const encData=xorProcess(origData,keyBits,startBit);document.getElementById('enc-progress-bar').style.width='60%';const decData=xorProcess(encData,keyBits,startBit);document.getElementById('enc-results').classList.remove('hidden');drawImageData(document.getElementById('enc-orig-canvas'),origData);drawImageData(document.getElementById('enc-enc-canvas'),encData);drawImageData(document.getElementById('enc-dec-canvas'),decData);const tp=SIZE*SIZE*3,rb=tp*8,au=Math.min(rb,keyBits.length-startBit);document.getElementById('enc-stats').innerHTML=`Key: <span class="text-accent">${keyBits.length.toLocaleString()}</span> bits | Required: <span class="text-gold">${rb.toLocaleString()}</span> | Used: <span class="text-accent">${au.toLocaleString()}</span>`;document.getElementById('enc-progress-bar').style.width='100%';document.getElementById('enc-status').textContent='Done!';}
 function xorProcess(imageData,keyBits,startBit){const data=new Uint8ClampedArray(imageData.data),keyLen=keyBits.length;let idx=startBit;for(let i=0;i<data.length;i+=4)for(let ch=0;ch<3;ch++){const val=data[i+ch];let result=0;for(let b=7;b>=0;b--){const bit=(val>>b)&1,keyBit=idx<keyLen?keyBits[idx]:0;result|=(bit^keyBit)<<b;idx++;}data[i+ch]=result;}return new ImageData(data,imageData.width,imageData.height);}
 
 async function runStatAnalysis(){
   const origFile=document.getElementById('stat-orig').files[0],encFile=document.getElementById('stat-enc').files[0];
-  if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}
+  if(!origFile||!encFile){alert('Upload both images');return;}
   const numPairs=parseInt(document.getElementById('stat-pairs').value)||3000;
   const origImg=await loadImageFromFile(origFile),encImg=await loadImageFromFile(encFile);
   const origData=getImageData(origImg,512),encData=getImageData(encImg,512);
-
-  /* Information Entropy */
   const origEnt=calculateImageEntropy(origData),encEnt=calculateImageEntropy(encData);
   document.getElementById('ent-orig-r').textContent=origEnt.r.entropy.toFixed(6);
   document.getElementById('ent-orig-g').textContent=origEnt.g.entropy.toFixed(6);
@@ -594,61 +359,30 @@ async function runStatAnalysis(){
   document.getElementById('ent-enc-b').textContent=encEnt.b.entropy.toFixed(6);
   document.getElementById('ent-enc-total').textContent=encEnt.totalEntropy.toFixed(6);
   document.getElementById('ent-diff-table').innerHTML=renderEntropyChangeTable(origEnt,encEnt);
-
   const totalDiff=encEnt.totalEntropy-origEnt.totalEntropy;
-  let analysisHTML='';
-  if(totalDiff>0){
-    analysisHTML=`<span class="text-accent font-bold">Entropy increased</span> by ${totalDiff.toFixed(6)} bits (relative increase: ${(totalDiff/origEnt.totalEntropy*100).toFixed(2)}%). The encrypted image pixel distribution is more uniform and random.`;
-  }else if(totalDiff<0){
-    analysisHTML=`<span class="text-rose font-bold">Entropy decreased</span> by ${(-totalDiff).toFixed(6)} bits (relative decrease: ${(-totalDiff/origEnt.totalEntropy*100).toFixed(2)}%).`;
-  }else{
-    analysisHTML=`Entropy remained unchanged.`;
-  }
-  analysisHTML+=`<br>Theoretical maximum for 8-bit images: <span class="font-bold">8 bits/pixel</span>. `;
-  analysisHTML+=`Original ratio: <span class="text-accent">${(origEnt.totalEntropy/8*100).toFixed(2)}%</span>, `;
-  analysisHTML+=`Encrypted ratio: <span class="text-accent">${(encEnt.totalEntropy/8*100).toFixed(2)}%</span>.`;
-  document.getElementById('ent-analysis-text').innerHTML=analysisHTML;
-
+  let aH=totalDiff>0?`<span class="text-accent font-bold">Entropy increased</span> by ${totalDiff.toFixed(6)} bits (${(totalDiff/origEnt.totalEntropy*100).toFixed(2)}%).`:totalDiff<0?`<span class="text-rose font-bold">Entropy decreased</span> by ${(-totalDiff).toFixed(6)} bits.`:`Entropy unchanged.`;
+  aH+=` Max: <span class="font-bold">8 bits/pixel</span>. Orig: <span class="text-accent">${(origEnt.totalEntropy/8*100).toFixed(2)}%</span>, Enc: <span class="text-accent">${(encEnt.totalEntropy/8*100).toFixed(2)}%</span>.`;
+  document.getElementById('ent-analysis-text').innerHTML=aH;
   destroyChart('entropy-compare');
-  state.charts['entropy-compare']=new Chart(document.getElementById('entropy-compare-chart'),{
-    type:'bar',
-    data:{
-      labels:['Red','Green','Blue','Total'],
-      datasets:[
-        {label:'Original',data:[origEnt.r.entropy,origEnt.g.entropy,origEnt.b.entropy,origEnt.totalEntropy],backgroundColor:'rgba(13,115,119,0.65)',borderColor:'#0d7377',borderWidth:1,borderRadius:6},
-        {label:'Encrypted',data:[encEnt.r.entropy,encEnt.g.entropy,encEnt.b.entropy,encEnt.totalEntropy],backgroundColor:'rgba(194,66,90,0.65)',borderColor:'#c2425a',borderWidth:1,borderRadius:6}
-      ]
-    },
-    options:{
-      responsive:true,
-      plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},
-      scales:{
-        x:{grid:{color:'#f0ece4'}},
-        y:{min:6,max:8.5,title:{display:true,text:'Entropy (bits/pixel)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'},ticks:{font:{family:'Arial',size:10},color:'#94a3b8'}}
-      }
-    }
-  });
-
-  /* Histograms & Correlations */
-  const origHist=calcHistogram(origData),encHist=calcHistogram(encData);
-  const origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);
+  state.charts['entropy-compare']=new Chart(document.getElementById('entropy-compare-chart'),{type:'bar',data:{labels:['Red','Green','Blue','Total'],datasets:[{label:'Original',data:[origEnt.r.entropy,origEnt.g.entropy,origEnt.b.entropy,origEnt.totalEntropy],backgroundColor:'rgba(13,115,119,0.65)',borderColor:'#0d7377',borderWidth:1,borderRadius:6},{label:'Encrypted',data:[encEnt.r.entropy,encEnt.g.entropy,encEnt.b.entropy,encEnt.totalEntropy],backgroundColor:'rgba(194,66,90,0.65)',borderColor:'#c2425a',borderWidth:1,borderRadius:6}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},scales:{x:{grid:{color:'#f0ece4'}},y:{min:6,max:8.5,title:{display:true,text:'Entropy (bits/pixel)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'},ticks:{font:{family:'Arial',size:10},color:'#94a3b8'}}}}});
+  const origHist=calcHistogram(origData),encHist=calcHistogram(encData),origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);
   document.getElementById('stat-results').classList.remove('hidden');
-  const histCfg=[{key:'r',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},{key:'g',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},{key:'b',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}];
-  histCfg.forEach(ch=>{destroyChart(ch.origId);state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});destroyChart(ch.encId);state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});});
-  const corrDirs=[{key:'horizontal',canvas:'corr-orig-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-orig-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-orig-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
-  corrDirs.forEach(d=>{destroyChart(d.canvas);const pts=origCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(13,115,119,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
-  const encCorrDirs=[{key:'horizontal',canvas:'corr-enc-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-enc-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-enc-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
-  encCorrDirs.forEach(d=>{destroyChart(d.canvas);const pts=encCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(194,66,90,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
+  [{key:'r',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},{key:'g',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},{key:'b',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}].forEach(ch=>{destroyChart(ch.origId);state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#f0ece4'}}}}});destroyChart(ch.encId);state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:{color:'#94a3b8',font:{size:9}},grid:{color:'#f0ece4'}}}}});});
+  const csR=[[0,'rgb(254,242,242)'],[0.3,'rgb(252,191,191)'],[0.6,'rgb(239,100,120)'],[1,'rgb(194,66,90)']],csG=[[0,'rgb(240,253,244)'],[0.3,'rgb(187,247,208)'],[0.6,'rgb(74,200,120)'],[1,'rgb(22,163,74)']],csB=[[0,'rgb(239,246,255)'],[0.3,'rgb(191,219,254)'],[0.6,'rgb(96,155,240)'],[1,'rgb(37,99,235)']];
+  render3DSurface(origData,0,'plot3d-orig-r',csR);render3DSurface(origData,1,'plot3d-orig-g',csG);render3DSurface(origData,2,'plot3d-orig-b',csB);
+  render3DSurface(encData,0,'plot3d-enc-r',csR);render3DSurface(encData,1,'plot3d-enc-g',csG);render3DSurface(encData,2,'plot3d-enc-b',csB);
+  [{key:'horizontal',canvas:'corr-orig-h',xL:'Pixel (i, j)',yL:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-orig-v',xL:'Pixel (i, j)',yL:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-orig-d',xL:'Pixel (i, j)',yL:'Pixel (i+1, j+1)'}].forEach(d=>{destroyChart(d.canvas);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:origCorr[d.key].slice(0,800),pointRadius:2.5,pointBackgroundColor:'rgba(13,115,119,0.5)',pointBorderColor:'transparent'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,ticks:{color:'#94a3b8',font:{size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,ticks:{color:'#94a3b8',font:{size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
+  [{key:'horizontal',canvas:'corr-enc-h'},{key:'vertical',canvas:'corr-enc-v'},{key:'diagonal',canvas:'corr-enc-d'}].forEach(d=>{destroyChart(d.canvas);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:encCorr[d.key].slice(0,800),pointRadius:2.5,pointBackgroundColor:'rgba(194,66,90,0.5)',pointBorderColor:'transparent'}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,ticks:{color:'#94a3b8',font:{size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,ticks:{color:'#94a3b8',font:{size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
   let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Direction</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig G</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig B</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc G</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Enc B</th></tr></thead><tbody>';
-  ['horizontal','vertical','diagonal'].forEach((dir,idx)=>{const bg=idx%2===0?'#fff':'#faf8f5';t+=`<tr style="background:${bg}"><td class="py-3 px-4 text-ink font-medium">${dir.charAt(0).toUpperCase()+dir.slice(1)}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});
+  ['horizontal','vertical','diagonal'].forEach((dir,idx)=>{t+=`<tr style="background:${idx%2===0?'#fff':'#faf8f5'}"><td class="py-3 px-4 text-ink font-medium">${dir.charAt(0).toUpperCase()+dir.slice(1)}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});
   document.getElementById('corr-table').innerHTML=t+'</tbody></table>';
 }
 function calcHistogram(imageData){const h={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};const d=imageData.data;for(let i=0;i<d.length;i+=4){h.r[d[i]]++;h.g[d[i+1]]++;h.b[d[i+2]]++;}return h;}
 function calcCorrelation(imageData,numPairs){const d=imageData.data,w=imageData.width,h=imageData.height;const result={horizontal:[],vertical:[],diagonal:[],horizontal_vals:{},vertical_vals:{},diagonal_vals:{}};const dirs=[{name:'horizontal',gen:()=>{const i=Math.floor(Math.random()*h),j=Math.floor(Math.random()*(w-1));return[[i,j],[i,j+1]];},},{name:'vertical',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*w);return[[i,j],[i+1,j]];},},{name:'diagonal',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*(w-1));return[[i,j],[i+1,j+1]];},}];const ppd=Math.floor(numPairs/3);dirs.forEach(dir=>{const r1=[],r2=[],g1=[],g2=[],b1=[],b2=[],pts=[];for(let p=0;p<ppd;p++){const[[i1,j1],[i2,j2]]=dir.gen();const i1x=(i1*w+j1)*4,i2x=(i2*w+j2)*4;r1.push(d[i1x]);r2.push(d[i2x]);g1.push(d[i1x+1]);g2.push(d[i2x+1]);b1.push(d[i1x+2]);b2.push(d[i2x+2]);pts.push({x:Math.round((d[i1x]+d[i1x+1]+d[i1x+2])/3),y:Math.round((d[i2x]+d[i2x+1]+d[i2x+2])/3)});}result[dir.name]=pts;result[dir.name+'_vals']={r:pearsonCorrelation(r1,r2),g:pearsonCorrelation(g1,g2),b:pearsonCorrelation(b1,b2)};});return result;}
 
-async function runQualityAnalysis(){const origFile=document.getElementById('q-orig').files[0],encFile=document.getElementById('q-enc').files[0];if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}document.getElementById('q-progress').classList.remove('hidden');document.getElementById('q-status').textContent='Loading...';document.getElementById('q-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512),od=origData.data,ed=encData.data,M=512,N=512,totalPixels=M*N;document.getElementById('q-progress-bar').style.width='15%';document.getElementById('q-status').textContent='Computing differences...';await new Promise(r=>setTimeout(r,50));const diffR=new Float64Array(totalPixels),diffG=new Float64Array(totalPixels),diffB=new Float64Array(totalPixels);let minDiff=Infinity,maxDiff=-Infinity;for(let i=0;i<totalPixels;i++){const idx=i*4;diffR[i]=od[idx]-ed[idx];diffG[i]=od[idx+1]-ed[idx+1];diffB[i]=od[idx+2]-ed[idx+2];const mx=Math.max(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i])),mn=Math.min(Math.abs(diffR[i]),Math.abs(diffG[i]),Math.abs(diffB[i]));if(mx>maxDiff)maxDiff=mx;if(mn<minDiff)minDiff=mn;}document.getElementById('q-progress-bar').style.width='25%';document.getElementById('q-status').textContent='Computing squares...';await new Promise(r=>setTimeout(r,50));const sqR=new Float64Array(totalPixels),sqG=new Float64Array(totalPixels),sqB=new Float64Array(totalPixels);for(let i=0;i<totalPixels;i++){sqR[i]=diffR[i]**2;sqG[i]=diffG[i]**2;sqB[i]=diffB[i]**2;}document.getElementById('q-progress-bar').style.width='35%';document.getElementById('q-status').textContent='Summing squares...';await new Promise(r=>setTimeout(r,50));let sumR=0,sumG=0,sumB=0,nzR=0,nzG=0,nzB=0;for(let i=0;i<totalPixels;i++){sumR+=sqR[i];sumG+=sqG[i];sumB+=sqB[i];if(sqR[i])nzR++;if(sqG[i])nzG++;if(sqB[i])nzB++;}const totalSum=sumR+sumG+sumB,totalNz=nzR+nzG+nzB;document.getElementById('q-progress-bar').style.width='45%';document.getElementById('q-status').textContent='MSE...';await new Promise(r=>setTimeout(r,50));const mseR=sumR/totalPixels,mseG=sumG/totalPixels,mseB=sumB/totalPixels,mseAll=totalSum/(3*totalPixels);document.getElementById('q-progress-bar').style.width='55%';document.getElementById('q-status').textContent='PSNR...';await new Promise(r=>setTimeout(r,50));const Imax=255,Imax2=Imax**2,eps=1e-10,psnrR=10*Math.log10(Imax2/(mseR+eps)),psnrG=10*Math.log10(Imax2/(mseG+eps)),psnrB=10*Math.log10(Imax2/(mseB+eps)),psnrAll=10*Math.log10(Imax2/(mseAll+eps));document.getElementById('q-progress-bar').style.width='65%';document.getElementById('q-status').textContent='SSIM (please wait)...';await new Promise(r=>setTimeout(r,50));const ws=parseInt(document.getElementById('ssim-window').value)||11,K1=parseFloat(document.getElementById('ssim-k1').value)||0.01,K2=parseFloat(document.getElementById('ssim-k2').value)||0.03,ssimR=computeSSIM(origData,encData,ws,K1,K2);document.getElementById('q-progress-bar').style.width='95%';document.getElementById('q-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('q-results').classList.remove('hidden');document.getElementById('mse-all-card').textContent=mseAll.toFixed(4);document.getElementById('psnr-all-card').textContent=psnrAll.toFixed(2)+' dB';document.getElementById('ssim-all-card').textContent=ssimR.all.toFixed(6);document.getElementById('diff-range').textContent=`[${minDiff.toFixed(0)}, ${maxDiff.toFixed(0)}]`;document.getElementById('mse-r').textContent=mseR.toFixed(6);document.getElementById('mse-g').textContent=mseG.toFixed(6);document.getElementById('mse-b').textContent=mseB.toFixed(6);document.getElementById('mse-all').textContent=mseAll.toFixed(6);document.getElementById('psnr-r').textContent=psnrR.toFixed(6)+' dB';document.getElementById('psnr-g').textContent=psnrG.toFixed(6)+' dB';document.getElementById('psnr-b').textContent=psnrB.toFixed(6)+' dB';document.getElementById('psnr-all').textContent=psnrAll.toFixed(6)+' dB';document.getElementById('ssim-r').textContent=ssimR.r.toFixed(6);document.getElementById('ssim-g').textContent=ssimR.g.toFixed(6);document.getElementById('ssim-b').textContent=ssimR.b.toFixed(6);document.getElementById('ssim-all').textContent=ssimR.all.toFixed(6);const fmt=v=>v.toLocaleString(undefined,{maximumFractionDigits:2});document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Statistic</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Total</th></tr></thead><tbody>`+`<tr style="background:#fff"><td class="py-3 px-4">Non-zero Diffs</td><td class="py-3 px-4 text-center">${nzR.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzG.toLocaleString()}</td><td class="py-3 px-4 text-center">${nzB.toLocaleString()}</td><td class="py-3 px-4 text-center font-medium">${totalNz.toLocaleString()}</td></tr>`+`<tr style="background:#faf8f5"><td class="py-3 px-4">Sum of Squares</td><td class="py-3 px-4 text-center">${fmt(sumR)}</td><td class="py-3 px-4 text-center">${fmt(sumG)}</td><td class="py-3 px-4 text-center">${fmt(sumB)}</td><td class="py-3 px-4 text-center font-medium">${fmt(totalSum)}</td></tr>`+`<tr style="background:#fff"><td class="py-3 px-4">MSE</td><td class="py-3 px-4 text-center">${mseR.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseG.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseB.toFixed(6)}</td><td class="py-3 px-4 text-center text-gold font-bold">${mseAll.toFixed(6)}</td></tr>`+`<tr style="background:#faf8f5"><td class="py-3 px-4">PSNR (dB)</td><td class="py-3 px-4 text-center">${psnrR.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrG.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrB.toFixed(4)}</td><td class="py-3 px-4 text-center text-accent font-bold">${psnrAll.toFixed(4)}</td></tr>`+`<tr style="background:#fff"><td class="py-3 px-4 font-medium">SSIM</td><td class="py-3 px-4 text-center">${ssimR.r.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.g.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.b.toFixed(6)}</td><td class="py-3 px-4 text-center text-rose font-bold">${ssimR.all.toFixed(6)}</td></tr></tbody></table>`;const pv=10*Math.log10(Imax2/mseAll);document.getElementById('q-detail').innerHTML=`<div class="text-accent mb-3 text-sm font-bold">===== Fidelity Analysis =====</div><div style="color:#6366f1" class="mb-2 font-bold">[Parameters]</div>${M}x${N}, Total pixels: ${totalPixels.toLocaleString()}, Imax=${Imax}<br>SSIM window: ${ws}x${ws}, K1=${K1}, K2=${K2}<br><br><div class="text-accent mb-2 font-bold text-sm">===== MSE =====</div><span style="color:#c2425a">R:</span> ${mseR.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${mseG.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${mseB.toFixed(6)}<br><span class="text-gold font-bold">Overall: ${mseAll.toFixed(6)}</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== PSNR =====</div><span style="color:#c2425a">R:</span> ${psnrR.toFixed(6)} dB<br><span style="color:#16a34a">G:</span> ${psnrG.toFixed(6)} dB<br><span style="color:#2563eb">B:</span> ${psnrB.toFixed(6)} dB<br><span class="text-accent font-bold">Overall: ${psnrAll.toFixed(6)} dB</span><br><br><div class="text-accent mb-2 font-bold text-sm">===== SSIM =====</div><span style="color:#c2425a">R:</span> ${ssimR.r.toFixed(6)}<br><span style="color:#16a34a">G:</span> ${ssimR.g.toFixed(6)}<br><span style="color:#2563eb">B:</span> ${ssimR.b.toFixed(6)}<br><span class="text-rose font-bold">Overall: ${ssimR.all.toFixed(6)}</span><br><br><div class="text-muted font-bold">Verification PSNR: ${pv.toFixed(6)} dB</div>`;document.getElementById('q-progress-bar').style.width='100%';document.getElementById('q-status').textContent='Done!';}
+async function runQualityAnalysis(){const origFile=document.getElementById('q-orig').files[0],encFile=document.getElementById('q-enc').files[0];if(!origFile||!encFile){alert('Upload both');return;}document.getElementById('q-progress').classList.remove('hidden');document.getElementById('q-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512),od=origData.data,ed=encData.data,totalPixels=512*512;let sumR=0,sumG=0,sumB=0;for(let i=0;i<totalPixels;i++){const idx=i*4;sumR+=(od[idx]-ed[idx])**2;sumG+=(od[idx+1]-ed[idx+1])**2;sumB+=(od[idx+2]-ed[idx+2])**2;}document.getElementById('q-progress-bar').style.width='50%';const mseR=sumR/totalPixels,mseG=sumG/totalPixels,mseB=sumB/totalPixels,mseAll=(sumR+sumG+sumB)/(3*totalPixels);const I2=65025,eps=1e-10,psnrR=10*Math.log10(I2/(mseR+eps)),psnrG=10*Math.log10(I2/(mseG+eps)),psnrB=10*Math.log10(I2/(mseB+eps)),psnrAll=10*Math.log10(I2/(mseAll+eps));document.getElementById('q-progress-bar').style.width='65%';const ws=parseInt(document.getElementById('ssim-window').value)||11,K1=parseFloat(document.getElementById('ssim-k1').value)||0.01,K2=parseFloat(document.getElementById('ssim-k2').value)||0.03,ssimR=computeSSIM(origData,encData,ws,K1,K2);document.getElementById('q-results').classList.remove('hidden');document.getElementById('mse-all-card').textContent=mseAll.toFixed(4);document.getElementById('psnr-all-card').textContent=psnrAll.toFixed(2)+' dB';document.getElementById('ssim-all-card').textContent=ssimR.all.toFixed(6);document.getElementById('mse-r').textContent=mseR.toFixed(6);document.getElementById('mse-g').textContent=mseG.toFixed(6);document.getElementById('mse-b').textContent=mseB.toFixed(6);document.getElementById('mse-all').textContent=mseAll.toFixed(6);document.getElementById('psnr-r').textContent=psnrR.toFixed(4)+' dB';document.getElementById('psnr-g').textContent=psnrG.toFixed(4)+' dB';document.getElementById('psnr-b').textContent=psnrB.toFixed(4)+' dB';document.getElementById('psnr-all').textContent=psnrAll.toFixed(4)+' dB';document.getElementById('ssim-r').textContent=ssimR.r.toFixed(6);document.getElementById('ssim-g').textContent=ssimR.g.toFixed(6);document.getElementById('ssim-b').textContent=ssimR.b.toFixed(6);document.getElementById('ssim-all').textContent=ssimR.all.toFixed(6);document.getElementById('q-channel-table').innerHTML=`<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Stat</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#c2425a">R</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#16a34a">G</th><th class="py-3 px-4 text-center" style="background:#faf8f5;color:#2563eb">B</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Total</th></tr></thead><tbody><tr style="background:#fff"><td class="py-3 px-4">MSE</td><td class="py-3 px-4 text-center">${mseR.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseG.toFixed(6)}</td><td class="py-3 px-4 text-center">${mseB.toFixed(6)}</td><td class="py-3 px-4 text-center text-gold font-bold">${mseAll.toFixed(6)}</td></tr><tr style="background:#faf8f5"><td class="py-3 px-4">PSNR</td><td class="py-3 px-4 text-center">${psnrR.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrG.toFixed(4)}</td><td class="py-3 px-4 text-center">${psnrB.toFixed(4)}</td><td class="py-3 px-4 text-center text-accent font-bold">${psnrAll.toFixed(4)}</td></tr><tr style="background:#fff"><td class="py-3 px-4">SSIM</td><td class="py-3 px-4 text-center">${ssimR.r.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.g.toFixed(6)}</td><td class="py-3 px-4 text-center">${ssimR.b.toFixed(6)}</td><td class="py-3 px-4 text-center text-rose font-bold">${ssimR.all.toFixed(6)}</td></tr></tbody></table>`;document.getElementById('q-progress-bar').style.width='100%';document.getElementById('q-status').textContent='Done!';}
 
-async function runRobustnessTest(){const imgFile=document.getElementById('rob-img').files[0],keyFile=document.getElementById('rob-key').files[0];if(!imgFile||!keyFile){alert('Please upload both image and key file');return;}const noiseLevels=[];document.querySelectorAll('.rob-noise:checked').forEach(cb=>noiseLevels.push(parseFloat(cb.value)));if(!noiseLevels.length){alert('Please select at least one noise ratio');return;}noiseLevels.sort((a,b)=>a-b);document.getElementById('rob-progress').classList.remove('hidden');document.getElementById('rob-status').textContent='Loading...';document.getElementById('rob-progress-bar').style.width='5%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(imgFile),keyText=await readFileAsText(keyFile),keyBits=parseBitstream(keyText,keyText.length),origData=getImageData(img,512);document.getElementById('rob-progress-bar').style.width='15%';document.getElementById('rob-status').textContent='Encrypting...';await new Promise(r=>setTimeout(r,50));const encData=xorProcess(origData,keyBits,0);const results=[];for(let s=0;s<noiseLevels.length;s++){const pct=noiseLevels[s];document.getElementById('rob-status').textContent=`Noise ${pct}% (${s+1}/${noiseLevels.length})...`;document.getElementById('rob-progress-bar').style.width=(15+(s/noiseLevels.length)*70)+'%';await new Promise(r=>setTimeout(r,50));const noisyEnc=addSaltPepperNoise(encData,pct),decData=xorProcess(noisyEnc,keyBits,0);const od=origData.data,dd=decData.data;let m=0;for(let i=0;i<od.length;i+=4)for(let c=0;c<3;c++){const d=od[i+c]-dd[i+c];m+=d*d;}const mse=m/(512*512*3),psnr=10*Math.log10(65025/(mse+1e-10));results.push({pct,decData,mse,psnr});}document.getElementById('rob-progress-bar').style.width='95%';document.getElementById('rob-status').textContent='Rendering...';await new Promise(r=>setTimeout(r,50));document.getElementById('rob-results').classList.remove('hidden');const gallery=document.getElementById('rob-gallery');gallery.innerHTML='';gallery.style.gridTemplateColumns=`repeat(${Math.min(results.length,5)},1fr)`;results.forEach((r,idx)=>{const card=document.createElement('div');card.className='rob-card fade-in';card.style.animationDelay=(idx*0.08)+'s';const info=document.createElement('div');info.className='px-5 pt-5 pb-3';const pc=r.psnr>30?'#16a34a':r.psnr>20?'#c49a2a':r.psnr>10?'#ea580c':'#c2425a';info.innerHTML=`<div class="flex items-baseline justify-between mb-3"><span class="font-display font-800 text-lg text-ink">Noise ${r.pct}%</span><span class="font-mono text-[10px] text-muted uppercase">Level</span></div><div class="flex items-baseline gap-2 mb-2"><span class="font-display font-800 text-3xl" style="color:${pc}">${r.psnr.toFixed(2)}</span><span class="font-mono text-sm text-muted">dB</span></div><div class="flex gap-2"><span class="font-mono text-xs px-3 py-1 rounded-full bg-sand text-muted">MSE ${r.mse.toFixed(1)}</span></div>`;card.appendChild(info);const canvas=document.createElement('canvas');canvas.width=r.decData.width;canvas.height=r.decData.height;canvas.style.cssText='width:100%;display:block;image-rendering:pixelated;border-top:1px solid #e2ddd5;';canvas.getContext('2d').putImageData(r.decData,0,0);card.appendChild(canvas);gallery.appendChild(card);});destroyChart('rob-psnr');state.charts['rob-psnr']=new Chart(document.getElementById('rob-psnr-chart'),{type:'line',data:{labels:results.map(r=>r.pct+'%'),datasets:[{label:'PSNR (dB)',data:results.map(r=>r.psnr),borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.08)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#0d7377',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},scales:{x:{title:{display:true,text:'Noise Ratio',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'PSNR (dB)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'}}}}});document.getElementById('rob-progress-bar').style.width='100%';document.getElementById('rob-status').textContent=`Done! ${results.length} noise levels`;}
+async function runRobustnessTest(){const imgFile=document.getElementById('rob-img').files[0],keyFile=document.getElementById('rob-key').files[0];if(!imgFile||!keyFile){alert('Upload both');return;}const noiseLevels=[];document.querySelectorAll('.rob-noise:checked').forEach(cb=>noiseLevels.push(parseFloat(cb.value)));if(!noiseLevels.length){alert('Select noise levels');return;}noiseLevels.sort((a,b)=>a-b);document.getElementById('rob-progress').classList.remove('hidden');document.getElementById('rob-progress-bar').style.width='5%';const img=await loadImageFromFile(imgFile),keyText=await readFileAsText(keyFile),keyBits=parseBitstream(keyText,keyText.length),origData=getImageData(img,512);document.getElementById('rob-progress-bar').style.width='15%';const encData=xorProcess(origData,keyBits,0);const results=[];for(let s=0;s<noiseLevels.length;s++){const pct=noiseLevels[s];document.getElementById('rob-status').textContent=`Noise ${pct}% (${s+1}/${noiseLevels.length})`;document.getElementById('rob-progress-bar').style.width=(15+(s/noiseLevels.length)*70)+'%';await new Promise(r=>setTimeout(r,50));const noisyEnc=addSaltPepperNoise(encData,pct),decData=xorProcess(noisyEnc,keyBits,0);const od=origData.data,dd=decData.data;let m=0;for(let i=0;i<od.length;i+=4)for(let c=0;c<3;c++){const d=od[i+c]-dd[i+c];m+=d*d;}const mse=m/(512*512*3),psnr=10*Math.log10(65025/(mse+1e-10));results.push({pct,decData,mse,psnr});}document.getElementById('rob-results').classList.remove('hidden');const gallery=document.getElementById('rob-gallery');gallery.innerHTML='';gallery.style.gridTemplateColumns=`repeat(${Math.min(results.length,5)},1fr)`;results.forEach((r,idx)=>{const card=document.createElement('div');card.className='rob-card fade-in';card.style.animationDelay=(idx*0.08)+'s';const pc=r.psnr>30?'#16a34a':r.psnr>20?'#c49a2a':r.psnr>10?'#ea580c':'#c2425a';const info=document.createElement('div');info.className='px-5 pt-5 pb-3';info.innerHTML=`<div class="flex items-baseline justify-between mb-3"><span class="font-display font-800 text-lg text-ink">Noise ${r.pct}%</span></div><div class="flex items-baseline gap-2 mb-2"><span class="font-display font-800 text-3xl" style="color:${pc}">${r.psnr.toFixed(2)}</span><span class="font-mono text-sm text-muted">dB</span></div><span class="font-mono text-xs px-3 py-1 rounded-full bg-sand text-muted">MSE ${r.mse.toFixed(1)}</span>`;card.appendChild(info);const canvas=document.createElement('canvas');canvas.width=r.decData.width;canvas.height=r.decData.height;canvas.style.cssText='width:100%;display:block;image-rendering:pixelated;border-top:1px solid #e2ddd5;';canvas.getContext('2d').putImageData(r.decData,0,0);card.appendChild(canvas);gallery.appendChild(card);});destroyChart('rob-psnr');state.charts['rob-psnr']=new Chart(document.getElementById('rob-psnr-chart'),{type:'line',data:{labels:results.map(r=>r.pct+'%'),datasets:[{label:'PSNR (dB)',data:results.map(r=>r.psnr),borderColor:'#0d7377',backgroundColor:'rgba(13,115,119,0.08)',fill:true,tension:.3,pointRadius:6,pointBackgroundColor:'#0d7377',pointBorderColor:'#fff',pointBorderWidth:3}]},options:{responsive:true,plugins:{legend:{labels:{color:'#7a7570',usePointStyle:true}}},scales:{x:{title:{display:true,text:'Noise Ratio',color:'#7a7570'},grid:{color:'#f0ece4'}},y:{title:{display:true,text:'PSNR (dB)',color:'#7a7570'},grid:{color:'#f0ece4'}}}}});document.getElementById('rob-progress-bar').style.width='100%';document.getElementById('rob-status').textContent=`Done! ${results.length} noise levels`;}
 function addSaltPepperNoise(imageData,p){const data=new Uint8ClampedArray(imageData.data),tp=imageData.width*imageData.height,nn=Math.floor(tp*p/100);for(let n=0;n<nn;n++){const idx=Math.floor(Math.random()*tp)*4;if(Math.random()<.5){data[idx]=255;data[idx+1]=255;data[idx+2]=255;}else{data[idx]=0;data[idx+1]=0;data[idx+2]=0;}}return new ImageData(data,imageData.width,imageData.height);}
 
 ['stat-orig','stat-enc','q-orig','q-enc','rob-img','rob-key'].forEach(id=>{document.getElementById(id).addEventListener('change',function(){const n=document.getElementById(id+'-name');if(n&&this.files[0])n.textContent=this.files[0].name;});});
