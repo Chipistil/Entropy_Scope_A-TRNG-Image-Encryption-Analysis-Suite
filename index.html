@@ -92,7 +92,7 @@
       </button>
       <button onclick="switchTab('statistics')" id="nav-statistics" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
-        <div><span class="block text-sm">Statistical Analysis</span><span class="block text-[10px] text-muted font-normal">Histogram & Corr</span></div>
+        <div><span class="block text-sm">Statistical Analysis</span><span class="block text-[10px] text-muted font-normal">Entropy & Histogram</span></div>
       </button>
       <button onclick="switchTab('quality')" id="nav-quality" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-body text-muted rounded-xl mb-1">
         <div class="w-8 h-8 rounded-lg flex items-center justify-center bg-sand flex-shrink-0"><svg class="w-4 h-4 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
@@ -259,7 +259,7 @@
       </button>
       <div id="stat-results" class="hidden">
 
-        <!-- ========== Information Entropy Analysis (NEW) ========== -->
+        <!-- ========== Information Entropy Analysis ========== -->
         <div class="fancy-divider"><span>Information Entropy</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-2 fade-in section-header">Information Entropy Analysis</h3>
         <p class="font-body text-sm text-muted mb-6 fade-in">Shannon entropy H = -Σp(i)·log₂(p(i)) for each R/G/B channel, comparing original and encrypted images (theoretical maximum: 8 bits/pixel for 8-bit images)</p>
@@ -307,7 +307,7 @@
         <div class="grid grid-cols-2 gap-6 mb-8">
           <div class="card p-6 fade-in" style="animation-delay:.08s">
             <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Change Summary</h3>
-            <p class="font-body text-xs text-muted mb-4">Per-channel entropy difference (Encrypted − Original) and ratio to theoretical maximum</p>
+            <p class="font-body text-xs text-muted mb-4">Per-channel entropy difference (Encrypted - Original) and ratio to theoretical maximum</p>
             <div id="ent-diff-table" class="overflow-x-auto mb-4"></div>
             <div id="ent-analysis-text" class="font-mono text-xs text-muted leading-relaxed bg-sand rounded-xl p-4"></div>
           </div>
@@ -316,11 +316,6 @@
             <p class="font-body text-xs text-muted mb-4">Grouped bar chart: Original vs Encrypted per-channel entropy</p>
             <canvas id="entropy-compare-chart" height="140"></canvas>
           </div>
-        </div>
-
-        <div class="card p-6 mb-8 fade-in" style="animation-delay:.16s">
-          <h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation Process</h3>
-          <div id="entropy-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div>
         </div>
         <!-- ========== End Information Entropy Analysis ========== -->
 
@@ -487,110 +482,20 @@ Chart.defaults.color='#7a7570';Chart.defaults.borderColor='#e2ddd5';Chart.defaul
 const fivePointStarPlugin={id:'fivePointStar',afterDatasetsDraw(chart){chart.data.datasets.forEach((dataset,di)=>{if(dataset._drawStar!==true)return;const meta=chart.getDatasetMeta(di);const ctx=chart.ctx;meta.data.forEach((pt)=>{const{x,y}=pt.getCenterPoint();const r=dataset._starSize||7;ctx.save();ctx.fillStyle=dataset.pointBackgroundColor||'#c2425a';ctx.strokeStyle=dataset.pointBorderColor||'#c2425a';ctx.lineWidth=1;ctx.beginPath();for(let k=0;k<5;k++){const oa=(k*2*Math.PI/5)-Math.PI/2;const ia=((k+0.5)*2*Math.PI/5)-Math.PI/2;const ox=x+r*Math.cos(oa);const oy=y+r*Math.sin(oa);const ix=x+(r*0.382)*Math.cos(ia);const iy=y+(r*0.382)*Math.sin(ia);if(k===0)ctx.moveTo(ox,oy);else ctx.lineTo(ox,oy);ctx.lineTo(ix,iy);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();});});}};
 Chart.register(fivePointStarPlugin);
 
-/* ==================== Information Entropy Calculation (NEW) ==================== */
+/* ==================== Information Entropy Calculation ==================== */
 function calculateImageEntropy(imageData){
   const d=imageData.data,w=imageData.width,h=imageData.height,totalPixels=w*h;
   const hist={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};
   for(let i=0;i<d.length;i+=4){hist.r[d[i]]++;hist.g[d[i+1]]++;hist.b[d[i+2]]++;}
   function channelEntropy(histogram){
     const probabilities=histogram.map(c=>c/totalPixels);
-    let entropy=0;const nonZeroPixels=[],nonZeroProbs=[],contributions=[];
-    for(let i=0;i<256;i++){if(probabilities[i]>0){const contrib=-probabilities[i]*Math.log2(probabilities[i]);entropy+=contrib;nonZeroPixels.push(i);nonZeroProbs.push(probabilities[i]);contributions.push(contrib);}}
-    let maxCount=0,maxIdx=0,minCount=Infinity,minIdx=0;
-    for(let i=0;i<256;i++){if(histogram[i]>maxCount){maxCount=histogram[i];maxIdx=i;}if(histogram[i]>0&&histogram[i]<minCount){minCount=histogram[i];minIdx=i;}}
-    return{entropy,histogram,probabilities,nonZeroPixels,nonZeroProbs,contributions,maxPixel:{value:maxIdx,count:maxCount},minPixel:{value:minIdx,count:minCount}};
+    let entropy=0;
+    for(let i=0;i<256;i++){if(probabilities[i]>0){entropy+=-probabilities[i]*Math.log2(probabilities[i]);}}
+    return{entropy};
   }
   const r=channelEntropy(hist.r),g=channelEntropy(hist.g),b=channelEntropy(hist.b);
   const totalEntropy=(r.entropy+g.entropy+b.entropy)/3;
   return{r,g,b,totalEntropy,totalPixels,width:w,height:h};
-}
-
-function generateEntropyDetail(origEnt,encEnt){
-  let h='';
-  h+=`<div class="text-accent mb-3 text-sm font-bold">===== Information Entropy Analysis =====</div>`;
-  h+=`<div style="color:#6366f1" class="mb-2 font-bold">[Calculation Principle]</div>`;
-  h+=`Information entropy formula: H = -Σ p(i) · log₂(p(i))<br>`;
-  h+=`Where p(i) is the probability of intensity level i, i ∈ [0, 255]<br>`;
-  h+=`p(i) = Count of pixels with value i / Total pixels<br>`;
-  h+=`For 8-bit images, theoretical maximum entropy = 8 bits/pixel<br><br>`;
-  h+=`<div style="color:#6366f1" class="mb-2 font-bold">[Image Information]</div>`;
-  h+=`Original: ${origEnt.width}×${origEnt.height}, Total pixels: ${origEnt.totalPixels.toLocaleString()}<br>`;
-  h+=`Encrypted: ${encEnt.width}×${encEnt.height}, Total pixels: ${encEnt.totalPixels.toLocaleString()}<br><br>`;
-
-  /* Original Image */
-  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Original Image Entropy =====</div>`;
-  const channels=[{name:'Red',key:'r',color:'#c2425a'},{name:'Green',key:'g',color:'#16a34a'},{name:'Blue',key:'b',color:'#2563eb'}];
-  channels.forEach((ch,idx)=>{
-    const ed=origEnt[ch.key];
-    h+=`<div class="mb-2 font-bold" style="color:${ch.color}">${idx+1}. ${ch.name} Channel (H_${ch.key.toUpperCase()})</div>`;
-    h+=`   Total pixels: ${origEnt.totalPixels.toLocaleString()}<br>`;
-    h+=`   a. Sample pixel value statistics:<br>`;
-    for(let i=0;i<256;i+=32){h+=`      Pixel ${String(i).padStart(3)}: count=${ed.histogram[i].toLocaleString().padStart(7)}, p=${ed.probabilities[i].toFixed(6)}<br>`;}
-    h+=`   Most frequent: pixel ${ed.maxPixel.value} (count=${ed.maxPixel.count.toLocaleString()})<br>`;
-    h+=`   Least frequent: pixel ${ed.minPixel.value} (count=${ed.minPixel.count.toLocaleString()})<br><br>`;
-    h+=`   b. Non-zero probability contribution examples (-p·log₂(p)):<br>`;
-    const show=Math.min(8,ed.nonZeroPixels.length);
-    for(let i=0;i<show;i++){h+=`      Pixel ${String(ed.nonZeroPixels[i]).padStart(3)}: p=${ed.nonZeroProbs[i].toFixed(6)}, -p·log₂(p)=${ed.contributions[i].toFixed(6)}<br>`;}
-    if(ed.nonZeroPixels.length>show){h+=`      ...<br>`;for(let i=-show;i<0;i++){const idx2=ed.nonZeroPixels.length+i;h+=`      Pixel ${String(ed.nonZeroPixels[idx2]).padStart(3)}: p=${ed.nonZeroProbs[idx2].toFixed(6)}, -p·log₂(p)=${ed.contributions[idx2].toFixed(6)}<br>`;}}
-    h+=`<br>   c. <span style="color:${ch.color}" class="font-bold">H_${ch.key.toUpperCase()} = ${ed.entropy.toFixed(6)} bits</span><br><br>`;
-  });
-  h+=`<div class="mb-2 font-bold" style="color:#0d7377">4. Total Entropy</div>`;
-  h+=`   H = (H_R + H_G + H_B) / 3<br>`;
-  h+=`     = (${origEnt.r.entropy.toFixed(6)} + ${origEnt.g.entropy.toFixed(6)} + ${origEnt.b.entropy.toFixed(6)}) / 3<br>`;
-  h+=`     = <span class="text-accent font-bold">${origEnt.totalEntropy.toFixed(6)} bits</span><br><br>`;
-
-  /* Encrypted Image */
-  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Encrypted Image Entropy =====</div>`;
-  channels.forEach((ch,idx)=>{
-    const ed=encEnt[ch.key];
-    h+=`<div class="mb-2 font-bold" style="color:${ch.color}">${idx+1}. ${ch.name} Channel (H_${ch.key.toUpperCase()})</div>`;
-    h+=`   Total pixels: ${encEnt.totalPixels.toLocaleString()}<br>`;
-    h+=`   a. Sample pixel value statistics:<br>`;
-    for(let i=0;i<256;i+=32){h+=`      Pixel ${String(i).padStart(3)}: count=${ed.histogram[i].toLocaleString().padStart(7)}, p=${ed.probabilities[i].toFixed(6)}<br>`;}
-    h+=`   Most frequent: pixel ${ed.maxPixel.value} (count=${ed.maxPixel.count.toLocaleString()})<br>`;
-    h+=`   Least frequent: pixel ${ed.minPixel.value} (count=${ed.minPixel.count.toLocaleString()})<br><br>`;
-    h+=`   b. Non-zero probability contribution examples:<br>`;
-    const show2=Math.min(8,ed.nonZeroPixels.length);
-    for(let i=0;i<show2;i++){h+=`      Pixel ${String(ed.nonZeroPixels[i]).padStart(3)}: p=${ed.nonZeroProbs[i].toFixed(6)}, -p·log₂(p)=${ed.contributions[i].toFixed(6)}<br>`;}
-    if(ed.nonZeroPixels.length>show2){h+=`      ...<br>`;for(let i=-show2;i<0;i++){const idx2=ed.nonZeroPixels.length+i;h+=`      Pixel ${String(ed.nonZeroPixels[idx2]).padStart(3)}: p=${ed.nonZeroProbs[idx2].toFixed(6)}, -p·log₂(p)=${ed.contributions[idx2].toFixed(6)}<br>`;}}
-    h+=`<br>   c. <span style="color:${ch.color}" class="font-bold">H_${ch.key.toUpperCase()} = ${ed.entropy.toFixed(6)} bits</span><br><br>`;
-  });
-  h+=`<div class="mb-2 font-bold" style="color:#0d7377">4. Total Entropy</div>`;
-  h+=`   H = (${encEnt.r.entropy.toFixed(6)} + ${encEnt.g.entropy.toFixed(6)} + ${encEnt.b.entropy.toFixed(6)}) / 3<br>`;
-  h+=`     = <span class="text-accent font-bold">${encEnt.totalEntropy.toFixed(6)} bits</span><br><br>`;
-
-  /* Entropy Change */
-  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Entropy Change =====</div>`;
-  const diffs=[
-    {name:'Red',key:'r',color:'#c2425a'},
-    {name:'Green',key:'g',color:'#16a34a'},
-    {name:'Blue',key:'b',color:'#2563eb'}
-  ];
-  diffs.forEach(ch=>{
-    const diff=encEnt[ch.key].entropy-origEnt[ch.key].entropy;
-    h+=`<span style="color:${ch.color}" class="font-bold">${ch.name}:</span> Encrypted − Original = ${encEnt[ch.key].entropy.toFixed(6)} − ${origEnt[ch.key].entropy.toFixed(6)} = <span class="font-bold">${diff>=0?'+':''}${diff.toFixed(6)} bits</span><br>`;
-  });
-  const totalDiff=encEnt.totalEntropy-origEnt.totalEntropy;
-  h+=`<span class="text-accent font-bold">Total: ${encEnt.totalEntropy.toFixed(6)} − ${origEnt.totalEntropy.toFixed(6)} = ${totalDiff>=0?'+':''}${totalDiff.toFixed(6)} bits</span><br><br>`;
-
-  /* Analysis */
-  h+=`<div class="text-accent mb-2 font-bold text-sm">[Analysis]</div>`;
-  if(totalDiff>0){
-    h+=`The information entropy of the encrypted image <span class="text-accent font-bold">increased</span>, indicating that the pixel distribution is more uniform and random, with good encryption effect.<br>`;
-    h+=`Entropy increased by ${totalDiff.toFixed(6)} bits, relative increase ratio: <span class="text-accent font-bold">${(totalDiff/origEnt.totalEntropy*100).toFixed(2)}%</span><br><br>`;
-  }else if(totalDiff<0){
-    h+=`The information entropy of the encrypted image <span class="text-rose font-bold">decreased</span>, which may be due to issues with the encryption algorithm or key selection.<br>`;
-    h+=`Entropy decreased by ${(-totalDiff).toFixed(6)} bits, relative decrease ratio: <span class="text-rose font-bold">${(-totalDiff/origEnt.totalEntropy*100).toFixed(2)}%</span><br><br>`;
-  }else{
-    h+=`The information entropy remained unchanged before and after encryption.<br><br>`;
-  }
-
-  /* Reference */
-  h+=`<div class="text-muted font-bold">[Information Entropy Reference]</div>`;
-  h+=`For 8-bit images (0-255), theoretical maximum entropy = 8 bits/pixel<br>`;
-  h+=`Original image total entropy / theoretical maximum: <span class="text-accent font-bold">${(origEnt.totalEntropy/8*100).toFixed(2)}%</span><br>`;
-  h+=`Encrypted image total entropy / theoretical maximum: <span class="text-accent font-bold">${(encEnt.totalEntropy/8*100).toFixed(2)}%</span><br>`;
-  return h;
 }
 
 function renderEntropyChangeTable(origEnt,encEnt){
@@ -625,7 +530,7 @@ function renderEntropyChangeTable(origEnt,encEnt){
   t+='</tbody></table>';
   return t;
 }
-/* ==================== End Information Entropy Calculation ==================== */
+/* ==================== End Information Entropy ==================== */
 
 function handleBSFile(i){state.bsFile=i.files[0];if(state.bsFile)document.getElementById('bs-filename').textContent=state.bsFile.name;}
 async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));
@@ -678,9 +583,8 @@ async function runStatAnalysis(){
   const origImg=await loadImageFromFile(origFile),encImg=await loadImageFromFile(encFile);
   const origData=getImageData(origImg,512),encData=getImageData(encImg,512);
 
-  /* ========== Information Entropy (NEW) ========== */
+  /* Information Entropy */
   const origEnt=calculateImageEntropy(origData),encEnt=calculateImageEntropy(encData);
-
   document.getElementById('ent-orig-r').textContent=origEnt.r.entropy.toFixed(6);
   document.getElementById('ent-orig-g').textContent=origEnt.g.entropy.toFixed(6);
   document.getElementById('ent-orig-b').textContent=origEnt.b.entropy.toFixed(6);
@@ -689,7 +593,6 @@ async function runStatAnalysis(){
   document.getElementById('ent-enc-g').textContent=encEnt.g.entropy.toFixed(6);
   document.getElementById('ent-enc-b').textContent=encEnt.b.entropy.toFixed(6);
   document.getElementById('ent-enc-total').textContent=encEnt.totalEntropy.toFixed(6);
-
   document.getElementById('ent-diff-table').innerHTML=renderEntropyChangeTable(origEnt,encEnt);
 
   const totalDiff=encEnt.totalEntropy-origEnt.totalEntropy;
@@ -726,9 +629,7 @@ async function runStatAnalysis(){
     }
   });
 
-  document.getElementById('entropy-detail').innerHTML=generateEntropyDetail(origEnt,encEnt);
-  /* ========== End Information Entropy ========== */
-
+  /* Histograms & Correlations */
   const origHist=calcHistogram(origData),encHist=calcHistogram(encData);
   const origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);
   document.getElementById('stat-results').classList.remove('hidden');
