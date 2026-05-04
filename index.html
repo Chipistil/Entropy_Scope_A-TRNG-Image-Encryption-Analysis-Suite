@@ -105,12 +105,13 @@
     </div>
     <div class="p-5 border-t border-line">
       <div class="flex items-center gap-2 mb-2"><div class="w-2 h-2 rounded-full bg-green-400"></div><span class="font-mono text-xs text-muted">Browser-based</span></div>
-      <p class="font-mono text-[10px] text-line">v1.5 · Pure Client-side</p>
+      <p class="font-mono text-[10px] text-line">v1.6 · Pure Client-side</p>
     </div>
   </nav>
 
   <main class="ml-64 flex-1 min-h-screen bg-cream">
 
+    <!-- ==================== Bitstream Analysis ==================== -->
     <section id="sec-bitstream" class="p-10 max-w-7xl mx-auto">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
@@ -184,6 +185,7 @@
       </div>
     </section>
 
+    <!-- ==================== Image Encryption ==================== -->
     <section id="sec-encryption" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
@@ -235,13 +237,14 @@
       </div>
     </section>
 
+    <!-- ==================== Statistical Analysis ==================== -->
     <section id="sec-statistics" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
           <span class="glow-badge"><span class="glow-dot"></span><span class="font-mono">03</span></span>
           <h2 class="font-display font-800 text-2xl text-ink tracking-tight section-header">Statistical Analysis</h2>
         </div>
-        <p class="font-body text-sm text-muted">Compare histogram distributions and adjacent pixel correlations between original and encrypted images</p>
+        <p class="font-body text-sm text-muted">Compare information entropy, histogram distributions, and adjacent pixel correlations between original and encrypted images</p>
       </div>
       <div class="grid grid-cols-2 gap-6 mb-6">
         <div class="card p-6 fade-in"><h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3><div class="drop-zone rounded-xl p-6 text-center cursor-pointer" onclick="document.getElementById('stat-orig').click()"><p class="text-sm text-ink font-medium" id="stat-orig-name">Click to upload original image</p></div><input type="file" id="stat-orig" class="hidden" accept="image/*"></div>
@@ -255,6 +258,72 @@
         <span class="flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Run Statistical Analysis</span>
       </button>
       <div id="stat-results" class="hidden">
+
+        <!-- ========== Information Entropy Analysis (NEW) ========== -->
+        <div class="fancy-divider"><span>Information Entropy</span></div>
+        <h3 class="font-display font-700 text-lg text-ink mb-2 fade-in section-header">Information Entropy Analysis</h3>
+        <p class="font-body text-sm text-muted mb-6 fade-in">Shannon entropy H = -Σp(i)·log₂(p(i)) for each R/G/B channel, comparing original and encrypted images (theoretical maximum: 8 bits/pixel for 8-bit images)</p>
+
+        <p class="font-mono text-[10px] text-muted uppercase tracking-widest mb-3 fade-in">Original Image Entropy</p>
+        <div class="grid grid-cols-4 gap-4 mb-5 fade-in">
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Red (H_R)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-rose" id="ent-orig-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Green (H_G)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(22,163,74,.08)"><svg class="w-4 h-4" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-orig-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Blue (H_B)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(37,99,235,.08)"><svg class="w-4 h-4 text-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-sky" id="ent-orig-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Total (H)</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-accent" id="ent-orig-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+        </div>
+
+        <p class="font-mono text-[10px] text-muted uppercase tracking-widest mb-3 fade-in" style="animation-delay:.04s">Encrypted Image Entropy</p>
+        <div class="grid grid-cols-4 gap-4 mb-5 fade-in" style="animation-delay:.04s">
+          <div class="stat-card card p-5" style="--accent-line:#c2425a;--accent-glow:rgba(194,66,90,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Red (H_R)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(194,66,90,.08)"><svg class="w-4 h-4 text-rose" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-rose" id="ent-enc-r">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#16a34a;--accent-glow:rgba(22,163,74,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Green (H_G)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(22,163,74,.08)"><svg class="w-4 h-4" style="color:#16a34a" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl" style="color:#16a34a" id="ent-enc-g">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#2563eb;--accent-glow:rgba(37,99,235,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Blue (H_B)</p><div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(37,99,235,.08)"><svg class="w-4 h-4 text-sky" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-sky" id="ent-enc-b">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+          <div class="stat-card card p-5" style="--accent-line:#0d7377;--accent-glow:rgba(13,115,119,.08)">
+            <div class="flex items-center justify-between mb-3"><p class="font-mono text-xs text-muted uppercase tracking-wider">Total (H)</p><div class="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div></div>
+            <p class="font-display font-800 text-3xl text-accent" id="ent-enc-total">—</p><p class="font-mono text-xs text-muted mt-1">bits / pixel</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6 mb-8">
+          <div class="card p-6 fade-in" style="animation-delay:.08s">
+            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Change Summary</h3>
+            <p class="font-body text-xs text-muted mb-4">Per-channel entropy difference (Encrypted − Original) and ratio to theoretical maximum</p>
+            <div id="ent-diff-table" class="overflow-x-auto mb-4"></div>
+            <div id="ent-analysis-text" class="font-mono text-xs text-muted leading-relaxed bg-sand rounded-xl p-4"></div>
+          </div>
+          <div class="card p-6 fade-in" style="animation-delay:.12s">
+            <h3 class="font-display font-700 text-base text-ink mb-1">Entropy Comparison</h3>
+            <p class="font-body text-xs text-muted mb-4">Grouped bar chart: Original vs Encrypted per-channel entropy</p>
+            <canvas id="entropy-compare-chart" height="140"></canvas>
+          </div>
+        </div>
+
+        <div class="card p-6 mb-8 fade-in" style="animation-delay:.16s">
+          <h3 class="font-display font-700 text-base text-ink mb-4">Detailed Calculation Process</h3>
+          <div id="entropy-detail" class="font-mono text-xs text-muted bg-sand rounded-xl p-5 overflow-auto max-h-[32rem] leading-relaxed"></div>
+        </div>
+        <!-- ========== End Information Entropy Analysis ========== -->
+
         <div class="fancy-divider"><span>Original · Histogram</span></div>
         <h3 class="font-display font-700 text-lg text-ink mb-5 fade-in section-header">Original Image Color Histogram</h3>
         <div class="grid grid-cols-3 gap-5 mb-8">
@@ -287,6 +356,7 @@
       </div>
     </section>
 
+    <!-- ==================== Fidelity Analysis ==================== -->
     <section id="sec-quality" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
@@ -354,6 +424,7 @@
       </div>
     </section>
 
+    <!-- ==================== Robustness Test ==================== -->
     <section id="sec-robustness" class="p-10 max-w-7xl mx-auto hidden">
       <div class="mb-8 fade-in">
         <div class="flex items-center gap-3 mb-1">
@@ -362,7 +433,6 @@
         </div>
         <p class="font-body text-sm text-muted">Add salt-and-pepper noise at different ratios to the encrypted image, then decrypt to evaluate noise resistance</p>
       </div>
-      <!-- CHANGE: 1fr 1fr 1.6fr -->
       <div class="grid gap-5 mb-6" style="grid-template-columns:1fr 1fr 1.6fr">
         <div class="card p-6 fade-in flex flex-col">
           <h3 class="font-display font-700 text-base text-ink mb-2">Original Image</h3>
@@ -417,6 +487,146 @@ Chart.defaults.color='#7a7570';Chart.defaults.borderColor='#e2ddd5';Chart.defaul
 const fivePointStarPlugin={id:'fivePointStar',afterDatasetsDraw(chart){chart.data.datasets.forEach((dataset,di)=>{if(dataset._drawStar!==true)return;const meta=chart.getDatasetMeta(di);const ctx=chart.ctx;meta.data.forEach((pt)=>{const{x,y}=pt.getCenterPoint();const r=dataset._starSize||7;ctx.save();ctx.fillStyle=dataset.pointBackgroundColor||'#c2425a';ctx.strokeStyle=dataset.pointBorderColor||'#c2425a';ctx.lineWidth=1;ctx.beginPath();for(let k=0;k<5;k++){const oa=(k*2*Math.PI/5)-Math.PI/2;const ia=((k+0.5)*2*Math.PI/5)-Math.PI/2;const ox=x+r*Math.cos(oa);const oy=y+r*Math.sin(oa);const ix=x+(r*0.382)*Math.cos(ia);const iy=y+(r*0.382)*Math.sin(ia);if(k===0)ctx.moveTo(ox,oy);else ctx.lineTo(ox,oy);ctx.lineTo(ix,iy);}ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();});});}};
 Chart.register(fivePointStarPlugin);
 
+/* ==================== Information Entropy Calculation (NEW) ==================== */
+function calculateImageEntropy(imageData){
+  const d=imageData.data,w=imageData.width,h=imageData.height,totalPixels=w*h;
+  const hist={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};
+  for(let i=0;i<d.length;i+=4){hist.r[d[i]]++;hist.g[d[i+1]]++;hist.b[d[i+2]]++;}
+  function channelEntropy(histogram){
+    const probabilities=histogram.map(c=>c/totalPixels);
+    let entropy=0;const nonZeroPixels=[],nonZeroProbs=[],contributions=[];
+    for(let i=0;i<256;i++){if(probabilities[i]>0){const contrib=-probabilities[i]*Math.log2(probabilities[i]);entropy+=contrib;nonZeroPixels.push(i);nonZeroProbs.push(probabilities[i]);contributions.push(contrib);}}
+    let maxCount=0,maxIdx=0,minCount=Infinity,minIdx=0;
+    for(let i=0;i<256;i++){if(histogram[i]>maxCount){maxCount=histogram[i];maxIdx=i;}if(histogram[i]>0&&histogram[i]<minCount){minCount=histogram[i];minIdx=i;}}
+    return{entropy,histogram,probabilities,nonZeroPixels,nonZeroProbs,contributions,maxPixel:{value:maxIdx,count:maxCount},minPixel:{value:minIdx,count:minCount}};
+  }
+  const r=channelEntropy(hist.r),g=channelEntropy(hist.g),b=channelEntropy(hist.b);
+  const totalEntropy=(r.entropy+g.entropy+b.entropy)/3;
+  return{r,g,b,totalEntropy,totalPixels,width:w,height:h};
+}
+
+function generateEntropyDetail(origEnt,encEnt){
+  let h='';
+  h+=`<div class="text-accent mb-3 text-sm font-bold">===== Information Entropy Analysis =====</div>`;
+  h+=`<div style="color:#6366f1" class="mb-2 font-bold">[Calculation Principle]</div>`;
+  h+=`Information entropy formula: H = -Σ p(i) · log₂(p(i))<br>`;
+  h+=`Where p(i) is the probability of intensity level i, i ∈ [0, 255]<br>`;
+  h+=`p(i) = Count of pixels with value i / Total pixels<br>`;
+  h+=`For 8-bit images, theoretical maximum entropy = 8 bits/pixel<br><br>`;
+  h+=`<div style="color:#6366f1" class="mb-2 font-bold">[Image Information]</div>`;
+  h+=`Original: ${origEnt.width}×${origEnt.height}, Total pixels: ${origEnt.totalPixels.toLocaleString()}<br>`;
+  h+=`Encrypted: ${encEnt.width}×${encEnt.height}, Total pixels: ${encEnt.totalPixels.toLocaleString()}<br><br>`;
+
+  /* Original Image */
+  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Original Image Entropy =====</div>`;
+  const channels=[{name:'Red',key:'r',color:'#c2425a'},{name:'Green',key:'g',color:'#16a34a'},{name:'Blue',key:'b',color:'#2563eb'}];
+  channels.forEach((ch,idx)=>{
+    const ed=origEnt[ch.key];
+    h+=`<div class="mb-2 font-bold" style="color:${ch.color}">${idx+1}. ${ch.name} Channel (H_${ch.key.toUpperCase()})</div>`;
+    h+=`   Total pixels: ${origEnt.totalPixels.toLocaleString()}<br>`;
+    h+=`   a. Sample pixel value statistics:<br>`;
+    for(let i=0;i<256;i+=32){h+=`      Pixel ${String(i).padStart(3)}: count=${ed.histogram[i].toLocaleString().padStart(7)}, p=${ed.probabilities[i].toFixed(6)}<br>`;}
+    h+=`   Most frequent: pixel ${ed.maxPixel.value} (count=${ed.maxPixel.count.toLocaleString()})<br>`;
+    h+=`   Least frequent: pixel ${ed.minPixel.value} (count=${ed.minPixel.count.toLocaleString()})<br><br>`;
+    h+=`   b. Non-zero probability contribution examples (-p·log₂(p)):<br>`;
+    const show=Math.min(8,ed.nonZeroPixels.length);
+    for(let i=0;i<show;i++){h+=`      Pixel ${String(ed.nonZeroPixels[i]).padStart(3)}: p=${ed.nonZeroProbs[i].toFixed(6)}, -p·log₂(p)=${ed.contributions[i].toFixed(6)}<br>`;}
+    if(ed.nonZeroPixels.length>show){h+=`      ...<br>`;for(let i=-show;i<0;i++){const idx2=ed.nonZeroPixels.length+i;h+=`      Pixel ${String(ed.nonZeroPixels[idx2]).padStart(3)}: p=${ed.nonZeroProbs[idx2].toFixed(6)}, -p·log₂(p)=${ed.contributions[idx2].toFixed(6)}<br>`;}}
+    h+=`<br>   c. <span style="color:${ch.color}" class="font-bold">H_${ch.key.toUpperCase()} = ${ed.entropy.toFixed(6)} bits</span><br><br>`;
+  });
+  h+=`<div class="mb-2 font-bold" style="color:#0d7377">4. Total Entropy</div>`;
+  h+=`   H = (H_R + H_G + H_B) / 3<br>`;
+  h+=`     = (${origEnt.r.entropy.toFixed(6)} + ${origEnt.g.entropy.toFixed(6)} + ${origEnt.b.entropy.toFixed(6)}) / 3<br>`;
+  h+=`     = <span class="text-accent font-bold">${origEnt.totalEntropy.toFixed(6)} bits</span><br><br>`;
+
+  /* Encrypted Image */
+  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Encrypted Image Entropy =====</div>`;
+  channels.forEach((ch,idx)=>{
+    const ed=encEnt[ch.key];
+    h+=`<div class="mb-2 font-bold" style="color:${ch.color}">${idx+1}. ${ch.name} Channel (H_${ch.key.toUpperCase()})</div>`;
+    h+=`   Total pixels: ${encEnt.totalPixels.toLocaleString()}<br>`;
+    h+=`   a. Sample pixel value statistics:<br>`;
+    for(let i=0;i<256;i+=32){h+=`      Pixel ${String(i).padStart(3)}: count=${ed.histogram[i].toLocaleString().padStart(7)}, p=${ed.probabilities[i].toFixed(6)}<br>`;}
+    h+=`   Most frequent: pixel ${ed.maxPixel.value} (count=${ed.maxPixel.count.toLocaleString()})<br>`;
+    h+=`   Least frequent: pixel ${ed.minPixel.value} (count=${ed.minPixel.count.toLocaleString()})<br><br>`;
+    h+=`   b. Non-zero probability contribution examples:<br>`;
+    const show2=Math.min(8,ed.nonZeroPixels.length);
+    for(let i=0;i<show2;i++){h+=`      Pixel ${String(ed.nonZeroPixels[i]).padStart(3)}: p=${ed.nonZeroProbs[i].toFixed(6)}, -p·log₂(p)=${ed.contributions[i].toFixed(6)}<br>`;}
+    if(ed.nonZeroPixels.length>show2){h+=`      ...<br>`;for(let i=-show2;i<0;i++){const idx2=ed.nonZeroPixels.length+i;h+=`      Pixel ${String(ed.nonZeroPixels[idx2]).padStart(3)}: p=${ed.nonZeroProbs[idx2].toFixed(6)}, -p·log₂(p)=${ed.contributions[idx2].toFixed(6)}<br>`;}}
+    h+=`<br>   c. <span style="color:${ch.color}" class="font-bold">H_${ch.key.toUpperCase()} = ${ed.entropy.toFixed(6)} bits</span><br><br>`;
+  });
+  h+=`<div class="mb-2 font-bold" style="color:#0d7377">4. Total Entropy</div>`;
+  h+=`   H = (${encEnt.r.entropy.toFixed(6)} + ${encEnt.g.entropy.toFixed(6)} + ${encEnt.b.entropy.toFixed(6)}) / 3<br>`;
+  h+=`     = <span class="text-accent font-bold">${encEnt.totalEntropy.toFixed(6)} bits</span><br><br>`;
+
+  /* Entropy Change */
+  h+=`<div class="text-accent mb-2 font-bold text-sm">===== Entropy Change =====</div>`;
+  const diffs=[
+    {name:'Red',key:'r',color:'#c2425a'},
+    {name:'Green',key:'g',color:'#16a34a'},
+    {name:'Blue',key:'b',color:'#2563eb'}
+  ];
+  diffs.forEach(ch=>{
+    const diff=encEnt[ch.key].entropy-origEnt[ch.key].entropy;
+    h+=`<span style="color:${ch.color}" class="font-bold">${ch.name}:</span> Encrypted − Original = ${encEnt[ch.key].entropy.toFixed(6)} − ${origEnt[ch.key].entropy.toFixed(6)} = <span class="font-bold">${diff>=0?'+':''}${diff.toFixed(6)} bits</span><br>`;
+  });
+  const totalDiff=encEnt.totalEntropy-origEnt.totalEntropy;
+  h+=`<span class="text-accent font-bold">Total: ${encEnt.totalEntropy.toFixed(6)} − ${origEnt.totalEntropy.toFixed(6)} = ${totalDiff>=0?'+':''}${totalDiff.toFixed(6)} bits</span><br><br>`;
+
+  /* Analysis */
+  h+=`<div class="text-accent mb-2 font-bold text-sm">[Analysis]</div>`;
+  if(totalDiff>0){
+    h+=`The information entropy of the encrypted image <span class="text-accent font-bold">increased</span>, indicating that the pixel distribution is more uniform and random, with good encryption effect.<br>`;
+    h+=`Entropy increased by ${totalDiff.toFixed(6)} bits, relative increase ratio: <span class="text-accent font-bold">${(totalDiff/origEnt.totalEntropy*100).toFixed(2)}%</span><br><br>`;
+  }else if(totalDiff<0){
+    h+=`The information entropy of the encrypted image <span class="text-rose font-bold">decreased</span>, which may be due to issues with the encryption algorithm or key selection.<br>`;
+    h+=`Entropy decreased by ${(-totalDiff).toFixed(6)} bits, relative decrease ratio: <span class="text-rose font-bold">${(-totalDiff/origEnt.totalEntropy*100).toFixed(2)}%</span><br><br>`;
+  }else{
+    h+=`The information entropy remained unchanged before and after encryption.<br><br>`;
+  }
+
+  /* Reference */
+  h+=`<div class="text-muted font-bold">[Information Entropy Reference]</div>`;
+  h+=`For 8-bit images (0-255), theoretical maximum entropy = 8 bits/pixel<br>`;
+  h+=`Original image total entropy / theoretical maximum: <span class="text-accent font-bold">${(origEnt.totalEntropy/8*100).toFixed(2)}%</span><br>`;
+  h+=`Encrypted image total entropy / theoretical maximum: <span class="text-accent font-bold">${(encEnt.totalEntropy/8*100).toFixed(2)}%</span><br>`;
+  return h;
+}
+
+function renderEntropyChangeTable(origEnt,encEnt){
+  const rows=[
+    {name:'Red (R)',orig:origEnt.r.entropy,enc:encEnt.r.entropy,color:'#c2425a'},
+    {name:'Green (G)',orig:origEnt.g.entropy,enc:encEnt.g.entropy,color:'#16a34a'},
+    {name:'Blue (B)',orig:origEnt.b.entropy,enc:encEnt.b.entropy,color:'#2563eb'},
+    {name:'Total (H)',orig:origEnt.totalEntropy,enc:encEnt.totalEntropy,color:'#0d7377'}
+  ];
+  let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted">';
+  t+='<th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Channel</th>';
+  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Original</th>';
+  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Encrypted</th>';
+  t+='<th class="py-3 px-4 text-center" style="background:#faf8f5">Change</th>';
+  t+='<th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Ratio to Max</th></tr></thead><tbody>';
+  rows.forEach((r,idx)=>{
+    const diff=r.enc-r.orig;
+    const pctOrig=(r.orig/8*100).toFixed(2);
+    const pctEnc=(r.enc/8*100).toFixed(2);
+    const bg=idx%2===0?'#fff':'#faf8f5';
+    const diffColor=diff>0?'#16a34a':diff<0?'#c2425a':'#7a7570';
+    const arrow=diff>0?'↑':diff<0?'↓':'→';
+    const isTotal=idx===3;
+    t+=`<tr style="background:${bg}">`;
+    t+=`<td class="py-3 px-4 font-medium" style="color:${r.color}">${r.name}</td>`;
+    t+=`<td class="py-3 px-4 text-center${isTotal?' font-bold':''}">${r.orig.toFixed(6)}</td>`;
+    t+=`<td class="py-3 px-4 text-center${isTotal?' font-bold':''}">${r.enc.toFixed(6)}</td>`;
+    t+=`<td class="py-3 px-4 text-center font-bold" style="color:${diffColor}">${diff>=0?'+':''}${diff.toFixed(6)} ${arrow}</td>`;
+    t+=`<td class="py-3 px-4 text-center">${pctOrig}% → <span class="font-bold">${pctEnc}%</span></td>`;
+    t+=`</tr>`;
+  });
+  t+='</tbody></table>';
+  return t;
+}
+/* ==================== End Information Entropy Calculation ==================== */
+
 function handleBSFile(i){state.bsFile=i.files[0];if(state.bsFile)document.getElementById('bs-filename').textContent=state.bsFile.name;}
 async function runBitstreamAnalysis(){if(!state.bsFile){alert('Please upload a bitstream file first');return;}const N=parseInt(document.getElementById('bs-n').value)||100000,maxLag=parseInt(document.getElementById('bs-lag').value)||1000;document.getElementById('bs-progress').classList.remove('hidden');document.getElementById('bs-status').textContent='Reading file...';document.getElementById('bs-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const text=await readFileAsText(state.bsFile);document.getElementById('bs-progress-bar').style.width='30%';document.getElementById('bs-status').textContent='Parsing...';await new Promise(r=>setTimeout(r,50));const bits=parseBitstream(text,N),actualN=bits.length;let c1=0;for(let i=0;i<actualN;i++)if(bits[i]===1)c1++;const c0=actualN-c1,p1=c1/actualN,p0=c0/actualN;let entropy=0;if(p1>0)entropy-=p1*Math.log2(p1);if(p0>0)entropy-=p0*Math.log2(p0);document.getElementById('bs-progress-bar').style.width='50%';document.getElementById('bs-status').textContent='Computing ACF...';await new Promise(r=>setTimeout(r,50));const mu=p1;let v=0;for(let i=0;i<actualN;i++)v+=(bits[i]-mu)**2;v/=actualN;const s2=v>0?v:1e-10;const lags=[],acfV=[];const step=Math.max(1,Math.floor(maxLag/500));
 for(let k=1;k<=maxLag;k+=step){let s=0;for(let i=0;i<actualN-k;i++)s+=(bits[i]-mu)*(bits[i+k]-mu);acfV.push(s/((actualN-k)*s2));lags.push(k);if(k%(step*100)===0){document.getElementById('bs-progress-bar').style.width=(50+(k/maxLag)*40)+'%';await new Promise(r=>setTimeout(r,0));}}
@@ -461,7 +671,77 @@ function handleEncKey(i){state.encKeyFile=i.files[0];if(state.encKeyFile)documen
 async function runEncryption(){if(!state.encImgFile||!state.encKeyFile){alert('Please upload both image and key file');return;}document.getElementById('enc-progress').classList.remove('hidden');document.getElementById('enc-status').textContent='Loading...';document.getElementById('enc-progress-bar').style.width='10%';await new Promise(r=>setTimeout(r,50));const img=await loadImageFromFile(state.encImgFile),keyText=await readFileAsText(state.encKeyFile),startBit=parseInt(document.getElementById('enc-start').value)||0,SIZE=512,origData=getImageData(img,SIZE),keyBits=parseBitstream(keyText,keyText.length);document.getElementById('enc-progress-bar').style.width='30%';document.getElementById('enc-status').textContent='Encrypting...';await new Promise(r=>setTimeout(r,50));const encData=xorProcess(origData,keyBits,startBit);document.getElementById('enc-progress-bar').style.width='60%';document.getElementById('enc-status').textContent='Decrypting...';await new Promise(r=>setTimeout(r,50));const decData=xorProcess(encData,keyBits,startBit);document.getElementById('enc-results').classList.remove('hidden');drawImageData(document.getElementById('enc-orig-canvas'),origData);drawImageData(document.getElementById('enc-enc-canvas'),encData);drawImageData(document.getElementById('enc-dec-canvas'),decData);const tp=SIZE*SIZE*3,rb=tp*8,au=Math.min(rb,keyBits.length-startBit);document.getElementById('enc-stats').innerHTML=`Key: <span class="text-accent">${keyBits.length.toLocaleString()}</span> bits<br>Start: <span style="color:#6366f1">${startBit}</span><br>Required: <span class="text-gold">${rb.toLocaleString()}</span><br>Used: <span class="text-accent">${au.toLocaleString()}</span><br>Remaining: <span class="text-rose">${Math.max(0,keyBits.length-startBit-au).toLocaleString()}</span>`+(keyBits.length<rb?`<br>Cycles: <span class="text-gold">${Math.ceil(rb/keyBits.length)}</span>`:'');document.getElementById('enc-progress-bar').style.width='100%';document.getElementById('enc-status').textContent='Done!';}
 function xorProcess(imageData,keyBits,startBit){const data=new Uint8ClampedArray(imageData.data),keyLen=keyBits.length;let idx=startBit;for(let i=0;i<data.length;i+=4)for(let ch=0;ch<3;ch++){const val=data[i+ch];let result=0;for(let b=7;b>=0;b--){const bit=(val>>b)&1,keyBit=idx<keyLen?keyBits[idx]:0;result|=(bit^keyBit)<<b;idx++;}data[i+ch]=result;}return new ImageData(data,imageData.width,imageData.height);}
 
-async function runStatAnalysis(){const origFile=document.getElementById('stat-orig').files[0],encFile=document.getElementById('stat-enc').files[0];if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}const numPairs=parseInt(document.getElementById('stat-pairs').value)||3000;const origData=getImageData(await loadImageFromFile(origFile),512),encData=getImageData(await loadImageFromFile(encFile),512);const origHist=calcHistogram(origData),encHist=calcHistogram(encData);const origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);document.getElementById('stat-results').classList.remove('hidden');const histCfg=[{key:'r',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},{key:'g',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},{key:'b',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}];histCfg.forEach(ch=>{destroyChart(ch.origId);state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});destroyChart(ch.encId);state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});});const corrDirs=[{key:'horizontal',canvas:'corr-orig-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-orig-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-orig-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];corrDirs.forEach(d=>{destroyChart(d.canvas);const pts=origCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(13,115,119,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});const encCorrDirs=[{key:'horizontal',canvas:'corr-enc-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-enc-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-enc-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];encCorrDirs.forEach(d=>{destroyChart(d.canvas);const pts=encCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(194,66,90,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Direction</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig G</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig B</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc G</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Enc B</th></tr></thead><tbody>';['horizontal','vertical','diagonal'].forEach((dir,idx)=>{const bg=idx%2===0?'#fff':'#faf8f5';t+=`<tr style="background:${bg}"><td class="py-3 px-4 text-ink font-medium">${dir.charAt(0).toUpperCase()+dir.slice(1)}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});document.getElementById('corr-table').innerHTML=t+'</tbody></table>';}
+async function runStatAnalysis(){
+  const origFile=document.getElementById('stat-orig').files[0],encFile=document.getElementById('stat-enc').files[0];
+  if(!origFile||!encFile){alert('Please upload both original and encrypted images');return;}
+  const numPairs=parseInt(document.getElementById('stat-pairs').value)||3000;
+  const origImg=await loadImageFromFile(origFile),encImg=await loadImageFromFile(encFile);
+  const origData=getImageData(origImg,512),encData=getImageData(encImg,512);
+
+  /* ========== Information Entropy (NEW) ========== */
+  const origEnt=calculateImageEntropy(origData),encEnt=calculateImageEntropy(encData);
+
+  document.getElementById('ent-orig-r').textContent=origEnt.r.entropy.toFixed(6);
+  document.getElementById('ent-orig-g').textContent=origEnt.g.entropy.toFixed(6);
+  document.getElementById('ent-orig-b').textContent=origEnt.b.entropy.toFixed(6);
+  document.getElementById('ent-orig-total').textContent=origEnt.totalEntropy.toFixed(6);
+  document.getElementById('ent-enc-r').textContent=encEnt.r.entropy.toFixed(6);
+  document.getElementById('ent-enc-g').textContent=encEnt.g.entropy.toFixed(6);
+  document.getElementById('ent-enc-b').textContent=encEnt.b.entropy.toFixed(6);
+  document.getElementById('ent-enc-total').textContent=encEnt.totalEntropy.toFixed(6);
+
+  document.getElementById('ent-diff-table').innerHTML=renderEntropyChangeTable(origEnt,encEnt);
+
+  const totalDiff=encEnt.totalEntropy-origEnt.totalEntropy;
+  let analysisHTML='';
+  if(totalDiff>0){
+    analysisHTML=`<span class="text-accent font-bold">Entropy increased</span> by ${totalDiff.toFixed(6)} bits (relative increase: ${(totalDiff/origEnt.totalEntropy*100).toFixed(2)}%). The encrypted image pixel distribution is more uniform and random.`;
+  }else if(totalDiff<0){
+    analysisHTML=`<span class="text-rose font-bold">Entropy decreased</span> by ${(-totalDiff).toFixed(6)} bits (relative decrease: ${(-totalDiff/origEnt.totalEntropy*100).toFixed(2)}%).`;
+  }else{
+    analysisHTML=`Entropy remained unchanged.`;
+  }
+  analysisHTML+=`<br>Theoretical maximum for 8-bit images: <span class="font-bold">8 bits/pixel</span>. `;
+  analysisHTML+=`Original ratio: <span class="text-accent">${(origEnt.totalEntropy/8*100).toFixed(2)}%</span>, `;
+  analysisHTML+=`Encrypted ratio: <span class="text-accent">${(encEnt.totalEntropy/8*100).toFixed(2)}%</span>.`;
+  document.getElementById('ent-analysis-text').innerHTML=analysisHTML;
+
+  destroyChart('entropy-compare');
+  state.charts['entropy-compare']=new Chart(document.getElementById('entropy-compare-chart'),{
+    type:'bar',
+    data:{
+      labels:['Red','Green','Blue','Total'],
+      datasets:[
+        {label:'Original',data:[origEnt.r.entropy,origEnt.g.entropy,origEnt.b.entropy,origEnt.totalEntropy],backgroundColor:'rgba(13,115,119,0.65)',borderColor:'#0d7377',borderWidth:1,borderRadius:6},
+        {label:'Encrypted',data:[encEnt.r.entropy,encEnt.g.entropy,encEnt.b.entropy,encEnt.totalEntropy],backgroundColor:'rgba(194,66,90,0.65)',borderColor:'#c2425a',borderWidth:1,borderRadius:6}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#7a7570',font:{family:'Arial',size:11},usePointStyle:true,padding:20}}},
+      scales:{
+        x:{grid:{color:'#f0ece4'}},
+        y:{min:6,max:8.5,title:{display:true,text:'Entropy (bits/pixel)',color:'#7a7570',font:{family:'Arial',size:11}},grid:{color:'#f0ece4'},ticks:{font:{family:'Arial',size:10},color:'#94a3b8'}}
+      }
+    }
+  });
+
+  document.getElementById('entropy-detail').innerHTML=generateEntropyDetail(origEnt,encEnt);
+  /* ========== End Information Entropy ========== */
+
+  const origHist=calcHistogram(origData),encHist=calcHistogram(encData);
+  const origCorr=calcCorrelation(origData,numPairs),encCorr=calcCorrelation(encData,numPairs);
+  document.getElementById('stat-results').classList.remove('hidden');
+  const histCfg=[{key:'r',color:'rgba(194,66,90,0.85)',fill:'rgba(194,66,90,0.15)',origId:'hist-orig-r',encId:'hist-enc-r'},{key:'g',color:'rgba(22,163,74,0.85)',fill:'rgba(22,163,74,0.15)',origId:'hist-orig-g',encId:'hist-enc-g'},{key:'b',color:'rgba(37,99,235,0.85)',fill:'rgba(37,99,235,0.15)',origId:'hist-orig-b',encId:'hist-enc-b'}];
+  histCfg.forEach(ch=>{destroyChart(ch.origId);state.charts[ch.origId]=new Chart(document.getElementById(ch.origId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:origHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});destroyChart(ch.encId);state.charts[ch.encId]=new Chart(document.getElementById(ch.encId),{type:'line',data:{labels:Array.from({length:256},(_,i)=>i),datasets:[{data:encHist[ch.key],borderColor:ch.color,backgroundColor:ch.fill,fill:true,pointRadius:0,borderWidth:2,tension:0.15}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{display:false},y:{title:{display:true,text:'Pixel Frequency',color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9}},grid:{color:'#f0ece4'}}}}});});
+  const corrDirs=[{key:'horizontal',canvas:'corr-orig-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-orig-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-orig-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
+  corrDirs.forEach(d=>{destroyChart(d.canvas);const pts=origCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(13,115,119,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
+  const encCorrDirs=[{key:'horizontal',canvas:'corr-enc-h',xLabel:'Pixel (i, j)',yLabel:'Pixel (i, j+1)'},{key:'vertical',canvas:'corr-enc-v',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j)'},{key:'diagonal',canvas:'corr-enc-d',xLabel:'Pixel (i, j)',yLabel:'Pixel (i+1, j+1)'}];
+  encCorrDirs.forEach(d=>{destroyChart(d.canvas);const pts=encCorr[d.key].slice(0,800);state.charts[d.canvas]=new Chart(document.getElementById(d.canvas),{type:'scatter',data:{datasets:[{data:pts,pointRadius:2.5,pointBackgroundColor:'rgba(194,66,90,0.5)',pointBorderColor:'transparent',pointBorderWidth:0}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{min:0,max:255,title:{display:true,text:d.xLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}},y:{min:0,max:255,title:{display:true,text:d.yLabel,color:'#7a7570',font:{family:'Arial',size:10}},ticks:{color:'#94a3b8',font:{family:'Arial',size:9},stepSize:50},grid:{color:'#f0ece4'}}}}});});
+  let t='<table class="w-full font-mono text-xs data-table"><thead><tr class="text-muted"><th class="py-3 px-4 text-left rounded-tl-lg" style="background:#faf8f5">Direction</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig G</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Orig B</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc R</th><th class="py-3 px-4 text-center" style="background:#faf8f5">Enc G</th><th class="py-3 px-4 text-center rounded-tr-lg" style="background:#faf8f5">Enc B</th></tr></thead><tbody>';
+  ['horizontal','vertical','diagonal'].forEach((dir,idx)=>{const bg=idx%2===0?'#fff':'#faf8f5';t+=`<tr style="background:${bg}"><td class="py-3 px-4 text-ink font-medium">${dir.charAt(0).toUpperCase()+dir.slice(1)}</td>`;['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-accent font-medium">${origCorr[dir+'_vals']?origCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});['r','g','b'].forEach(ch=>{t+=`<td class="py-3 px-4 text-center text-rose font-medium">${encCorr[dir+'_vals']?encCorr[dir+'_vals'][ch].toFixed(4):'—'}</td>`;});t+='</tr>';});
+  document.getElementById('corr-table').innerHTML=t+'</tbody></table>';
+}
 function calcHistogram(imageData){const h={r:new Array(256).fill(0),g:new Array(256).fill(0),b:new Array(256).fill(0)};const d=imageData.data;for(let i=0;i<d.length;i+=4){h.r[d[i]]++;h.g[d[i+1]]++;h.b[d[i+2]]++;}return h;}
 function calcCorrelation(imageData,numPairs){const d=imageData.data,w=imageData.width,h=imageData.height;const result={horizontal:[],vertical:[],diagonal:[],horizontal_vals:{},vertical_vals:{},diagonal_vals:{}};const dirs=[{name:'horizontal',gen:()=>{const i=Math.floor(Math.random()*h),j=Math.floor(Math.random()*(w-1));return[[i,j],[i,j+1]];},},{name:'vertical',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*w);return[[i,j],[i+1,j]];},},{name:'diagonal',gen:()=>{const i=Math.floor(Math.random()*(h-1)),j=Math.floor(Math.random()*(w-1));return[[i,j],[i+1,j+1]];},}];const ppd=Math.floor(numPairs/3);dirs.forEach(dir=>{const r1=[],r2=[],g1=[],g2=[],b1=[],b2=[],pts=[];for(let p=0;p<ppd;p++){const[[i1,j1],[i2,j2]]=dir.gen();const i1x=(i1*w+j1)*4,i2x=(i2*w+j2)*4;r1.push(d[i1x]);r2.push(d[i2x]);g1.push(d[i1x+1]);g2.push(d[i2x+1]);b1.push(d[i1x+2]);b2.push(d[i2x+2]);pts.push({x:Math.round((d[i1x]+d[i1x+1]+d[i1x+2])/3),y:Math.round((d[i2x]+d[i2x+1]+d[i2x+2])/3)});}result[dir.name]=pts;result[dir.name+'_vals']={r:pearsonCorrelation(r1,r2),g:pearsonCorrelation(g1,g2),b:pearsonCorrelation(b1,b2)};});return result;}
 
